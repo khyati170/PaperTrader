@@ -1,0 +1,221 @@
+/* === Reset === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* === Design Tokens === */
+:root {
+  --color-bg: #FAF6EF;           /* warm off-white background */
+  --color-bg-alt: #F0E9DC;       /* slightly deeper section background */
+
+  --color-heading: #241C0A;      /* near-black espresso — large headings, big numbers */
+  --color-eyebrow: #A38C68;      /* warm sand — labels, ticker names */
+  --color-subheading: #3D2A17;   /* deep brown — section titles */
+
+  --color-gain: #0F6E56;         /* muted teal-green — positive change */
+  --color-loss: #A1442E;         /* muted rust-red — negative change */
+
+  --color-accent: #0F4C4C;       /* deep teal — buttons, links, active nav */
+  --color-accent-hover: #135f5f; /* slightly lighter teal for hover */
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-heading);
+}
+
+/* === Navbar === */
+.bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--color-bg);
+  border-bottom: 2px solid var(--color-bg-alt);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.logo a {
+  color: var(--color-heading);
+  transition: color 0.3s ease;
+}
+
+.logo a:hover,
+.logo a:active {
+  color: var(--color-accent);
+}
+
+.links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.links a {
+  color: var(--color-subheading);
+}
+
+.links a:hover,
+.links a:active {
+  color: var(--color-accent);
+}
+
+.bar a {
+  text-decoration: none;
+}
+
+/* === Hero === */
+.pic {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-image: url('/hero_background.jpeg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Dark overlay since hero image is likely rich/dark — keeps light text readable */
+  background: linear-gradient(to bottom, rgba(36, 28, 10, 0.3), rgba(36, 28, 10, 0.6));
+  color: var(--color-bg);
+}
+
+.content {
+  margin: 40px;
+  padding: 20px;
+  font-size: x-large;
+}
+
+.content h1 {
+  color: var(--color-bg);
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeUp 1s ease forwards;
+}
+
+.content h2 {
+  color: var(--color-eyebrow);
+  font-weight: 400;
+  opacity: 0;
+  transform: translateY(40px);
+  animation: fadeUp 1s ease forwards;
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 0.95;
+    transform: translateY(0px);
+  }
+}
+
+.cta-btn {
+  display: block;
+  width: max-content;
+  margin: 20px auto 0;
+  padding: 12px 30px;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  text-decoration: none;
+  font-size: 1.5rem;
+  border-radius: 40px;
+  transition: background-color 0.4s ease, transform 0.2s ease;
+}
+
+.cta-btn:hover {
+  background-color: var(--color-accent-hover);
+  transform: scale(1.02);
+}
+
+/* === Feature Sections === */
+.one {
+  width: 100%;
+  padding: 40px 20px;
+  display: flex;
+  background-color: var(--color-bg-alt);
+}
+
+.two {
+  width: 100%;
+  padding: 40px 20px;
+  display: flex;
+  background-color: var(--color-bg);
+}
+
+.content-1 {
+  max-width: 800px;
+  margin: 0 10px;
+  text-align: left;
+  color: var(--color-subheading);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.content-2 {
+  max-width: 800px;
+  margin: 0 0 0 auto;
+  text-align: right;
+  color: var(--color-subheading);
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.feature-icon{
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+}
+
+/* === Gain / Loss Utility Classes (for later use in Stock Cards, Portfolio, etc.) === */
+.gain {
+  color: var(--color-gain);
+  font-weight: 600;
+}
+
+.loss {
+  color: var(--color-loss);
+  font-weight: 600;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .bar {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .content {
+    font-size: large;
+    margin: 20px;
+  }
+
+  .cta-btn {
+    margin: 20px auto 0;
+    font-size: 1.2rem;
+  }
+
+  .content-1,
+  .content-2 {
+    max-width: 100%;
+    text-align: left;
+    margin: 0;
+  }
+}
