@@ -1,6 +1,5 @@
-import StockCard from "./StockCard";
-import { stocks } from "./MockStocks";
-
+import StockCard from "../components/StockCard";
+import { getStocks } from "../data/stocks";
 export default function MarketPage({ watchlist, toggleWatchlist }) {
   return (
     <div className="market-page">

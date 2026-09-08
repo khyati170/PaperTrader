@@ -37,3 +37,4 @@ function StockCard({symbol,company,price,change,hp,lp,op}){
         
     )
 }
+export default StockCard;

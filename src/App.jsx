@@ -15,12 +15,10 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-import Navbar from "./Navbar";
-import Home from "./Home";
-import MarketPage from "./MarketPage";
-import WatchlistPage from "./WatchlistPage";
-import StockDetail from "./StockDetail";
-import { stocks } from "./stocks";
+import Navbar from "./components/navbar";
+import Home from "./pages/Home"
+import MarketPage from "./pages/MarketPage";
+import { getStocks } from "./data/stocks";
 
 function App() {
   const [watchlist, setWatchlist] = useState(() => {
@@ -56,18 +54,9 @@ function App() {
         <Route
           path="/market"
           element={
-            <MarketPage
-              stocks={stocks}
-              watchlist={watchlist}
-              toggleWatchlist={toggleWatchlist}
-            />
-          }
+            <MarketPage />}
         />
-        <Route
-          path="/watchlist"
-          element={<WatchlistPage watchlist={watchlist} stocks={stocks} toggleWatchlist={toggleWatchlist} />}
-        />
-        <Route path="/stock/:symbol" element={<StockDetail stocks={stocks} />} />
+        
       </Routes>
     </BrowserRouter>
   );
