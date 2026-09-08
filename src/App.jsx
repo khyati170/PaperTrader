@@ -18,7 +18,7 @@ import { useState, useEffect } from "react";
 import Navbar from "./components/navbar";
 import Home from "./pages/Home"
 import MarketPage from "./pages/MarketPage";
-import { getStocks } from "./data/stocks";
+import WatchList from "./pages/WatchList";
 
 function App() {
   const [watchlist, setWatchlist] = useState(() => {
@@ -59,9 +59,16 @@ function App() {
             toggleWatchlist={toggleWatchlist}
          />
         }
-    />
-       
-        
+      />
+       <Route
+       path="/watchlist"
+        element={
+           <WatchList
+            watchlist={watchlist}
+            toggleWatchlist={toggleWatchlist}
+        />
+      }
+      />   
       </Routes>
     </BrowserRouter>
   );
