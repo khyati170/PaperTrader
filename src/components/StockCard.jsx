@@ -1,4 +1,4 @@
-function StockCard({symbol,company,price,change}){
+function StockCard({symbol,company,price,change,hp,lp,op}){
     return(
         <div className="stock-card">
             <div className="stock-heading">
@@ -13,7 +13,17 @@ function StockCard({symbol,company,price,change}){
             <div className={change >= 0 ? "positive" : "negative"}>
                 {change >= 0 ? "+" : ""}{change}%
             </div>
-
+            <div className="prices">
+                <div className="high-price">
+                    <p>High Price: {hp}</p>
+                </div>
+                <div className="low-price">
+                    <p>Low Price: {lp}</p>
+                </div>
+                <div className="open-price">
+                    <p>Opening price: {op}</p>
+                </div>
+            </div>
             <div className="stock-action">
                 <button className="view-stock">
                     View Stocks
