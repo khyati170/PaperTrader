@@ -11,7 +11,7 @@ function Navbar() {
         <Link to="/">Home</Link>
         <Link to="/market">Market</Link>
         <Link to="#">Portfolio</Link>
-        <Link to="#">WatchList</Link>
+        <Link to="/watchlist">WatchList</Link>
       </div>
       <ThemeToggle/>
     </nav>
