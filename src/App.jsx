@@ -52,10 +52,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
-          path="/market"
-          element={
-            <MarketPage />}
-        />
+         path="/market"
+        element={
+          <MarketPage
+            watchlist={watchlist}
+            toggleWatchlist={toggleWatchlist}
+         />
+        }
+    />
+       
         
       </Routes>
     </BrowserRouter>

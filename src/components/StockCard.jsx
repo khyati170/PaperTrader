@@ -1,4 +1,4 @@
-function StockCard({symbol,company,price,change,hp,lp,op}){
+function StockCard({symbol,company,price,change,hp,lp,op,isWatchlisted,onWatchlistClick}){
     return(
         <div className="stock-card">
             <div className="stock-heading">
@@ -24,12 +24,14 @@ function StockCard({symbol,company,price,change,hp,lp,op}){
                     <p>Opening price: {op}</p>
                 </div>
             </div>
+
             <div className="stock-action">
                 <button className="view-stock">
                     View Stocks
                 </button>
-                <button className="watchlist">
-                    WatchList
+
+                <button className="watchlist" onClick={onWatchlistClick}>
+                    {isWatchlisted ? "Remove from Watchlist" : "Add to Watchlist"}
                 </button>
             </div>
         </div>
