@@ -7,7 +7,7 @@ import BuySellForm from "../components/BuySellForm.jsx";
 import "../styles/stock.css";
 
 function StockDetail() {
-    const { symbol } = useParams(); // comes from the route: /stock/:symbol
+    const { symbol } = useParams(); 
 
     const company = companies.find((c) => c.symbol === symbol) || companies[0];
 
