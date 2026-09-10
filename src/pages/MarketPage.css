@@ -1,0 +1,181 @@
+.market-page {
+  padding: 2rem;
+  background-color: var(--color-bg);
+}
+
+/* Header */
+
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.market-header h1 {
+  color: var(--color-heading);
+  font-size: 1.8rem;
+}
+
+/* Market Layout */
+
+.market-body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+}
+
+/* Filter Sidebar */
+
+.filter-sidebar {
+  background: var(--color-bg-alt);
+  border-radius: 14px;
+  padding: 16px;
+  height: fit-content;
+}
+
+.filter-group {
+  margin-bottom: 18px;
+}
+
+.filter-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-subheading);
+  margin-bottom: 8px;
+}
+
+.filter-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-eyebrow);
+  margin-bottom: 6px;
+}
+
+/* Price Range */
+
+.filter-group input[type="range"] {
+  width: 100%;
+}
+
+/* Sort */
+
+.filter-group select {
+  width: 100%;
+  padding: 7px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-bg);
+  color: var(--color-subheading);
+}
+
+/* Stock Grid */
+
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+/* Stock Card */
+
+.stock-card {
+  background: var(--color-bg-alt);
+  border-radius: 14px;
+  padding: 16px;
+  transition: transform 0.2s ease;
+}
+
+.stock-card:hover {
+  transform: scale(1.02);
+}
+
+.stock-heading h3 {
+  color: var(--color-heading);
+  font-size: 1rem;
+}
+
+.stock-heading p {
+  color: var(--color-eyebrow);
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+.stock-price p {
+  color: var(--color-subheading);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* High / Low / Opening Prices */
+
+.prices {
+  margin-top: 8px;
+}
+
+.prices p {
+  color: var(--color-eyebrow);
+  font-size: 0.8rem;
+  margin: 4px 0;
+}
+
+/* Positive / Negative */
+
+.positive {
+  color: green;
+  font-weight: 600;
+}
+
+.negative {
+  color: red;
+  font-weight: 600;
+}
+
+/* Buttons */
+
+.stock-action {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.stock-action button {
+  flex: 1;
+  border: none;
+  border-radius: 40px;
+  padding: 8px 0;
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.view-stock {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.view-stock:hover {
+  background: var(--color-accent-hover);
+}
+
+.watchlist {
+  background: transparent;
+  border: 1.5px solid var(--color-accent) !important;
+  color: var(--color-accent);
+}
+
+.watchlist.active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* Mobile */
+
+@media (max-width: 768px) {
+  .market-body {
+    grid-template-columns: 1fr;
+  }
+}

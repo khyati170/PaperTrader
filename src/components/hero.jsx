@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 function Hero() {
   return (
     <div className="pic">
@@ -5,7 +6,9 @@ function Hero() {
         <div className="content">
           <h1>Paper Trader</h1>
           <h2>making you a better trader</h2>
-          <a href="#" className="cta-btn">Start Trading</a>
+            <Link to="/market" className="cta-btn">
+            Start Trading
+          </Link>
         </div>
       </div>
     </div>
