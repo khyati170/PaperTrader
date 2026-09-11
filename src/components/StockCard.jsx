@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
 function StockCard({symbol,company,price,change,hp,lp,op,isWatchlisted,onWatchlistClick}){
+    const navigate = useNavigate();
+
     return(
         <div className="stock-card">
             <div className="stock-heading">
@@ -26,7 +29,7 @@ function StockCard({symbol,company,price,change,hp,lp,op,isWatchlisted,onWatchli
             </div>
 
             <div className="stock-action">
-                <button className="view-stock">
+                <button className="view-stock" onClick={() => navigate(`/stock/${symbol}`)}>
                     View Stocks
                 </button>
 

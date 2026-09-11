@@ -19,6 +19,7 @@ import Navbar from "./components/navbar";
 import Home from "./pages/Home"
 import MarketPage from "./pages/MarketPage";
 import WatchList from "./pages/WatchList";
+import StockDetail from "./StockDetail.jsx";
 
 function App() {
   const [watchlist, setWatchlist] = useState(() => {
@@ -74,4 +75,5 @@ function App() {
   );
 }
 
+<Route path="/stock/:symbol" element={<StockDetail />} />
 export default App;
