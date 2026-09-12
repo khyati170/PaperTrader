@@ -89,27 +89,27 @@
 
 const API_KEY = import.meta.env.VITE_FINNHUB_API_KEY;
 
-const symbols = [
-  "AAPL",
-  "MSFT",
-  "GOOGL",
-  "AMZN",
-  "NVDA",
-  "META",
-  "TSLA",
-  "NFLX",
-  "AMD",
-  "INTC",
-  "JPM",
-  "V",
-  "MA",
-  "WMT",
-  "DIS",
-  "KO",
-  "PEP",
-  "NKE",
-  "ORCL",
-  "ADBE"
+const stocksData = [
+  { symbol: "AAPL", name: "Apple Inc." },
+  { symbol: "MSFT", name: "Microsoft Corporation" },
+  { symbol: "GOOGL", name: "Alphabet Inc." },
+  { symbol: "AMZN", name: "Amazon.com, Inc." },
+  { symbol: "NVDA", name: "NVIDIA Corporation" },
+  { symbol: "META", name: "Meta Platforms, Inc." },
+  { symbol: "TSLA", name: "Tesla, Inc." },
+  { symbol: "NFLX", name: "Netflix, Inc." },
+  { symbol: "AMD", name: "Advanced Micro Devices, Inc." },
+  { symbol: "INTC", name: "Intel Corporation" },
+  { symbol: "JPM", name: "JPMorgan Chase & Co." },
+  { symbol: "V", name: "Visa Inc." },
+  { symbol: "MA", name: "Mastercard Incorporated" },
+  { symbol: "WMT", name: "Walmart Inc." },
+  { symbol: "DIS", name: "The Walt Disney Company" },
+  { symbol: "KO", name: "The Coca-Cola Company" },
+  { symbol: "PEP", name: "PepsiCo, Inc." },
+  { symbol: "NKE", name: "NIKE, Inc." },
+  { symbol: "ORCL", name: "Oracle Corporation" },
+  { symbol: "ADBE", name: "Adobe Inc." }
 ];
 
 const sectors = {
@@ -162,10 +162,10 @@ export async function getStocks() {
 
     const stocks = [];
 
-    for (const symbol of symbols) {
+    for (const stockData of stocksData) {
 
       const response = await fetch(
-        `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`
+        `https://finnhub.io/api/v1/quote?symbol=${stockData.symbol}&token=${API_KEY}`
       );
 
       if (!response.ok) {
@@ -176,7 +176,7 @@ export async function getStocks() {
       const data = await response.json();
 
       stocks.push({
-        symbol: symbol,
+        symbol: stockData.name,
         sector: sectors[symbol],
         price: data.c,
         change: data.dp,
