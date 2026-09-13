@@ -179,3 +179,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+
+
+/* --- Skeleton loading state --- */
+
+.skeleton-line {
+  background: linear-gradient(90deg, var(--color-bg) 25%, #e5ddc8 50%, var(--color-bg) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+  border-radius: 6px;
+  height: 12px;
+}
+
+.skeleton-title { height: 16px; width: 60%; margin-bottom: 8px; }
+.skeleton-subtitle { width: 80%; margin-bottom: 14px; }
+.skeleton-price { height: 18px; width: 50%; margin-bottom: 8px; }
+.skeleton-change { width: 30%; margin-bottom: 14px; }
+.skeleton-mini { width: 90%; margin-bottom: 6px; }
+
+.stock-action .skeleton-btn {
+  flex: 1;
+  height: 30px;
+  border-radius: 40px;
+  background: linear-gradient(90deg, var(--color-bg) 25%, #e5ddc8 50%, var(--color-bg) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

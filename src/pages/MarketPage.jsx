@@ -4,6 +4,7 @@ import StockCard from "../components/StockCard";
 import GainersLosersWidget from "../components/GainersLosersWidget";
 import { getStocks } from "../data/stocks";
 import "./MarketPage.css";
+import SkeletonCard from "../components/SkeletonCard";
 
 export default function MarketPage({
   watchlist = [],
@@ -14,6 +15,7 @@ export default function MarketPage({
   const [selectedSectors, setSelectedSectors] = useState([]);
   const [sortBy, setSortBy] = useState("default");
   const [maxPrice, setMaxPrice] = useState(1000);
+  const [isLoading, setIsLoading] = useState(true);
 
   //   useEffect(() => {
 //     getStocks().then((data) => {
@@ -22,6 +24,7 @@ export default function MarketPage({
 //   }, []);
 
   useEffect(() => {
+  setIsLoading(true);
     getStocks()
       .then((data) => {
         console.log("STOCK DATA:", data);
@@ -29,7 +32,10 @@ export default function MarketPage({
       })
       .catch((error) => {
         console.error("STOCK ERROR:", error);
-      });
+      })
+      .finally(() => {
+      setIsLoading(false);
+    });
   }, []);
 
   // Sector checkbox
@@ -147,7 +153,10 @@ export default function MarketPage({
 
         {/* Stock Grid */}
         <div className="stock-grid">
-          {filteredStocks.map((stock) => (
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+            : filteredStocks.map((stock) => (
+
             <Link
               key={stock.symbol}
               to={`/stock/${stock.symbol}`}
