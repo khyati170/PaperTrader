@@ -169,7 +169,7 @@ export async function getStocks() {
       );
 
       if (!response.ok) {
-        console.log("Failed:", symbol, response.status);
+        console.log("Failed:", stockData.symbol, response.status);
         continue;
       }
 
@@ -177,7 +177,8 @@ export async function getStocks() {
 
       stocks.push({
         symbol: stockData.name,
-        sector: sectors[symbol],
+        name: stockData.name,
+        sector: sectors[stockData.symbol],
         price: data.c,
         change: data.dp,
         highprice: data.h,
@@ -186,7 +187,7 @@ export async function getStocks() {
       });
     }
 
-    if (stocks.length === symbols.length) {
+    if (stocks.length === stocksData.length) {
       sessionStorage.setItem("stocks", JSON.stringify(stocks));
       console.log("Stocks saved to sessionStorage");
     } else {

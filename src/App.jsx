@@ -69,11 +69,12 @@ function App() {
             toggleWatchlist={toggleWatchlist}
         />
       }
-      />   
+      /> 
+      <Route path="/stock/:symbol" element={<StockDetail />} /> 
       </Routes>
     </BrowserRouter>
   );
 }
 
-<Route path="/stock/:symbol" element={<StockDetail />} />
+
 export default App;
