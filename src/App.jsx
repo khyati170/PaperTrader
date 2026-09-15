@@ -58,31 +58,61 @@ function App() {
     setBalance(userData.balance);
   };
 
-  // Centralized buy/sell so ANY page (StockDetail, later Portfolio) uses the same logic
   const handleBuy = (symbol, price, quantity) => {
     const cost = price * quantity;
     if (cost > balance) {
       alert("Insufficient balance");
       return;
     }
+
     setBalance((prev) => prev - cost);
-    setHoldings((prev) => ({
-      ...prev,
-      [symbol]: (prev[symbol] || 0) + quantity,
-    }));
+
+    setHoldings((prev) => {
+      const existing = prev[symbol];
+
+      if (!existing) {
+        return {
+          ...prev,
+          [symbol]: { quantity, avgBuyPrice: price },
+        };
+      }
+
+      const totalCost = existing.avgBuyPrice * existing.quantity + price * quantity;
+      const totalQuantity = existing.quantity + quantity;
+      const newAvgBuyPrice = totalCost / totalQuantity;
+
+      return {
+        ...prev,
+        [symbol]: { quantity: totalQuantity, avgBuyPrice: newAvgBuyPrice },
+      };
+    });
   };
 
   const handleSell = (symbol, price, quantity) => {
-    const currentlyOwned = holdings[symbol] || 0;
+    const existing = holdings[symbol];
+    const currentlyOwned = existing?.quantity || 0;
+
     if (quantity > currentlyOwned) {
       alert("You don't own that many shares");
       return;
     }
+
     setBalance((prev) => prev + price * quantity);
-    setHoldings((prev) => ({
-      ...prev,
-      [symbol]: prev[symbol] - quantity,
-    }));
+
+    setHoldings((prev) => {
+      const remaining = existing.quantity - quantity;
+
+      if (remaining === 0) {
+        const updated = { ...prev };
+        delete updated[symbol];
+        return updated;
+      }
+
+      return {
+        ...prev,
+        [symbol]: { quantity: remaining, avgBuyPrice: existing.avgBuyPrice },
+      };
+    });
   };
 
   return (

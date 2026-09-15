@@ -24,8 +24,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
         return () => { isMounted = false; };
     }, [symbol]);
 
-   
-    const ownedShares = holdings[symbol] || 0;
+    const ownedShares = holdings[symbol]?.quantity || 0;
 
     const handleBuy = (stockArg, quantity) => {
         onBuy(stockArg.symbol, stockArg.price, quantity);
