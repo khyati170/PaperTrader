@@ -183,7 +183,8 @@ export async function getStocks() {
         change: data.dp,
         highprice: data.h,
         lowprice: data.l,
-        openprice: data.o
+        openprice: data.o,
+        previousclose: data.pc 
       });
     }
 

@@ -23,9 +23,6 @@ function StockCard({symbol,company,price,change,hp,lp,op,isWatchlisted,onWatchli
                 <div className="low-price">
                     <p>Low Price: ${lp}</p>
                 </div>
-                <div className="open-price">
-                    <p>Opening price: ${op}</p>
-                </div>
             </div>
 
             <div className="stock-action">

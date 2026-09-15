@@ -4,14 +4,11 @@ import { getStocks } from "./data/stocks.js";
 import BuySellForm from "./components/BuySellForm.jsx";
 import "./stockDetail.css";
 
-function StockDetail() {
+function StockDetail({ balance, holdings, onBuy, onSell }) {
     const { symbol } = useParams();
 
     const [stock, setStock] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const [balance, setBalance] = useState(50000);
-    const [ownedShares, setOwnedShares] = useState(0);
 
     useEffect(() => {
         let isMounted = true;
@@ -27,23 +24,15 @@ function StockDetail() {
         return () => { isMounted = false; };
     }, [symbol]);
 
+   
+    const ownedShares = holdings[symbol] || 0;
+
     const handleBuy = (stockArg, quantity) => {
-        const cost = stockArg.price * quantity;
-        if (cost > balance) {
-            alert("Insufficient balance");
-            return;
-        }
-        setBalance((prev) => prev - cost);
-        setOwnedShares((prev) => prev + quantity);
+        onBuy(stockArg.symbol, stockArg.price, quantity);
     };
 
     const handleSell = (stockArg, quantity) => {
-        if (quantity > ownedShares) {
-            alert("You don't own that many shares");
-            return;
-        }
-        setBalance((prev) => prev + stockArg.price * quantity);
-        setOwnedShares((prev) => prev - quantity);
+        onSell(stockArg.symbol, stockArg.price, quantity);
     };
 
     if (loading) {
@@ -85,6 +74,7 @@ function StockDetail() {
                         <tr><td>High Price</td><td>${stock.highprice}</td></tr>
                         <tr><td>Low Price</td><td>${stock.lowprice}</td></tr>
                         <tr><td>Opening Price</td><td>${stock.openprice}</td></tr>
+                        <tr><td>Previous Close</td><td>${stock.previousclose}</td></tr>
                     </tbody>
                 </table>
             </section>

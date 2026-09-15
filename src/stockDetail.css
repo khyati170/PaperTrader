@@ -272,3 +272,45 @@ tr:last-child td {
         font-size: 26px;
     }
 }
+
+/*  Login notification */
+.login-toast {
+    max-width: 380px;
+    margin: 30px auto 0;
+    background: var(--color-bg-alt, var(--color-gain));
+    border-left: 4px solid var(--color-gain);
+    padding: 16px 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: slideDown 0.3s ease;
+}
+
+.login-toast-icon {
+    font-size: 22px;
+}
+
+.login-toast-title {
+    margin: 0 0 4px;
+    font-weight: 700;
+    color: var(--color-heading);
+    font-size: 15px;
+}
+
+.login-toast-text {
+    margin: 0;
+    font-size: 13px;
+    color: var(--color-subheading);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
