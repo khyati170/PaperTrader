@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "./components/navbar";
-import Home from "./pages/Home"
+import Home from "./pages/Home";
 import MarketPage from "./pages/MarketPage";
 import WatchList from "./pages/WatchList";
 import StockDetail from "./StockDetail.jsx";
