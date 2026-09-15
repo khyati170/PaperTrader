@@ -272,6 +272,136 @@ body {
   font-size: 0.9rem;
 }
 /* responsive design */
+
+.features-section {
+  padding: 80px 40px;
+  text-align: center;
+  background-color: var(--color-bg);
+}
+
+.section-subheading {
+  color: var(--color-eyebrow);
+  font-size: 0.95rem;
+  margin-bottom: 48px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background-color: var(--color-bg-alt);
+  border-radius: 16px;
+  padding: 28px 24px;
+  text-align: left;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(36, 28, 10, 0.08);
+}
+
+.feature-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+}
+
+.feature-card h3 {
+  color: var(--color-subheading);
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  color: var(--color-eyebrow);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.final-cta {
+  text-align: center;
+  padding: 80px 20px;
+  background-color: var(--color-bg-alt);
+}
+
+.final-cta h2 {
+  color: var(--color-heading);
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.final-cta p {
+  color: var(--color-eyebrow);
+  margin-bottom: 24px;
+}
+.footer {
+  background-color: var(--color-heading);
+  color: var(--color-bg);
+  padding: 48px 40px 20px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto 32px;
+}
+
+.footer-logo {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-bg);
+}
+
+.footer-tagline {
+  color: var(--color-eyebrow);
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  color: var(--color-bg);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--color-accent);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  text-align: center;
+  padding-top: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.footer-bottom p {
+  color: var(--color-eyebrow);
+  font-size: 0.75rem;
+}
 @media (max-width: 768px) {
   .bar {
     flex-direction: column;

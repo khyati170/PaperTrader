@@ -1,23 +1,21 @@
 import Hero from "../components/hero";
 import FeatureSection from "../components/FeatureSection";
-import { features } from "../data/features";
+
 import HowItworks from "../components/HowItworks";
+import FinalCTA from "../components/FinalCTA";
+import Footer from "../components/Footer";
 
 function Home() {
   return (
     <>
       <Hero />
       <HowItworks />
+      <FeatureSection/>
+      <FinalCTA/>
+      <Footer/>
 
-      {features.map((feature, index) => (
-        <FeatureSection
-          key={feature.id}
-          variant={index % 2 === 0 ? "one" : "two"}
-          icon={feature.icon}
-          title={feature.title}
-          text={feature.text}
-        />
-      ))}
+
+      
     </>
   );
 }
