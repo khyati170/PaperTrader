@@ -12,6 +12,7 @@ function Navbar() {
         <Link to="/market">Market</Link>
         <Link to="#">Portfolio</Link>
         <Link to="/watchlist">WatchList</Link>
+        <Link to="/login">Login</Link>
       </div>
       <ThemeToggle/>
     </nav>
