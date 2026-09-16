@@ -89,9 +89,7 @@ function App() {
         };
       }
 
-      // Defensive fallbacks — prevents NaN if existing data is
-      // ever missing/corrupted (e.g. from an API hiccup or old
-      // localStorage data saved before this fix)
+      
       const existingQty = Number(existing.quantity) || 0;
       const existingAvgPrice = Number(existing.avgBuyPrice) || 0;
 
