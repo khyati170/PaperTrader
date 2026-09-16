@@ -17,11 +17,6 @@ export default function MarketPage({
   const [maxPrice, setMaxPrice] = useState(1000);
   const [isLoading, setIsLoading] = useState(true);
 
-  //   useEffect(() => {
-//     getStocks().then((data) => {
-//       setStocks(data);
-//     });
-//   }, []);
 
   useEffect(() => {
   setIsLoading(true);
