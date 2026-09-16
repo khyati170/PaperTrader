@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import Navbar from "./components/navbar";
+
 import Home from "./pages/Home";
 import MarketPage from "./pages/MarketPage";
 import WatchList from "./pages/WatchList";
@@ -59,18 +61,14 @@ function App() {
     setBalance(userData.balance);
   };
 
-<<<<<<< HEAD
-  // Centralized buy/sell so ANY page (StockDetail, later Portfolio) uses the same logic
-  
-    const handleBuy = (symbol, price, quantity) => {
+  const handleBuy = (symbol, price, quantity) => {
     if (!price || price <= 0) {
       alert("Price unavailable right now, try again in a moment.");
       return;
     }
-=======
-  const handleBuy = (symbol, price, quantity) => {
->>>>>>> 1ef4e184a68b9009649e8ab717e33132e49507b7
+
     const cost = price * quantity;
+
     if (cost > balance) {
       alert("Insufficient balance");
       return;
@@ -84,23 +82,33 @@ function App() {
       if (!existing) {
         return {
           ...prev,
-          [symbol]: { quantity, avgBuyPrice: price },
+          [symbol]: {
+            quantity,
+            avgBuyPrice: price,
+          },
         };
       }
 
-      const totalCost = existing.avgBuyPrice * existing.quantity + price * quantity;
+      const totalCost =
+        existing.avgBuyPrice * existing.quantity + price * quantity;
+
       const totalQuantity = existing.quantity + quantity;
+
       const newAvgBuyPrice = totalCost / totalQuantity;
 
       return {
         ...prev,
-        [symbol]: { quantity: totalQuantity, avgBuyPrice: newAvgBuyPrice },
+        [symbol]: {
+          quantity: totalQuantity,
+          avgBuyPrice: newAvgBuyPrice,
+        },
       };
     });
   };
 
   const handleSell = (symbol, price, quantity) => {
     const existing = holdings[symbol];
+
     const currentlyOwned = existing?.quantity || 0;
 
     if (quantity > currentlyOwned) {
@@ -111,7 +119,7 @@ function App() {
     setBalance((prev) => prev + price * quantity);
 
     setHoldings((prev) => {
-      const remaining = existing.quantity - quantity;
+      const remaining = currentlyOwned - quantity;
 
       if (remaining === 0) {
         const updated = { ...prev };
@@ -121,24 +129,47 @@ function App() {
 
       return {
         ...prev,
-        [symbol]: { quantity: remaining, avgBuyPrice: existing.avgBuyPrice },
+        [symbol]: {
+          quantity: remaining,
+          avgBuyPrice: existing.avgBuyPrice,
+        },
       };
     });
   };
 
   return (
     <BrowserRouter>
-      <Navbar isAuthenticated={isAuthenticated} balance={balance} />
+      <Navbar
+        isAuthenticated={isAuthenticated}
+        balance={balance}
+      />
+
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={<Home />}
+        />
+
         <Route
           path="/market"
-          element={<MarketPage watchlist={watchlist} toggleWatchlist={toggleWatchlist} />}
+          element={
+            <MarketPage
+              watchlist={watchlist}
+              toggleWatchlist={toggleWatchlist}
+            />
+          }
         />
+
         <Route
           path="/watchlist"
-          element={<WatchList watchlist={watchlist} toggleWatchlist={toggleWatchlist} />}
+          element={
+            <WatchList
+              watchlist={watchlist}
+              toggleWatchlist={toggleWatchlist}
+            />
+          }
         />
+
         <Route
           path="/stock/:symbol"
           element={
@@ -150,14 +181,25 @@ function App() {
             />
           }
         />
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+
         <Route
-  path="/portfolio"
-  element={<Portfolio balance={balance} holdings={holdings} />}
-/>
+          path="/login"
+          element={<Login onLogin={handleLogin} />}
+        />
+
+        <Route
+          path="/portfolio"
+          element={
+            <Portfolio
+              balance={balance}
+              holdings={holdings}
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
+
