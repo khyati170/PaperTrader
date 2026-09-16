@@ -6,6 +6,7 @@ import MarketPage from "./pages/MarketPage";
 import WatchList from "./pages/WatchList";
 import StockDetail from "./StockDetail.jsx";
 import Login from "./pages/Login.jsx";
+import Portfolio from "./pages/Portfolio.jsx";
 
 function App() {
   const [watchlist, setWatchlist] = useState(() => {
@@ -59,7 +60,12 @@ function App() {
   };
 
   // Centralized buy/sell so ANY page (StockDetail, later Portfolio) uses the same logic
-  const handleBuy = (symbol, price, quantity) => {
+  
+    const handleBuy = (symbol, price, quantity) => {
+    if (!price || price <= 0) {
+      alert("Price unavailable right now, try again in a moment.");
+      return;
+    }
     const cost = price * quantity;
     if (cost > balance) {
       alert("Insufficient balance");
@@ -110,6 +116,10 @@ function App() {
           }
         />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route
+  path="/portfolio"
+  element={<Portfolio balance={balance} holdings={holdings} />}
+/>
       </Routes>
     </BrowserRouter>
   );
