@@ -89,12 +89,15 @@ function App() {
         };
       }
 
-      const totalCost =
-        existing.avgBuyPrice * existing.quantity + price * quantity;
+      // Defensive fallbacks — prevents NaN if existing data is
+      // ever missing/corrupted (e.g. from an API hiccup or old
+      // localStorage data saved before this fix)
+      const existingQty = Number(existing.quantity) || 0;
+      const existingAvgPrice = Number(existing.avgBuyPrice) || 0;
 
-      const totalQuantity = existing.quantity + quantity;
-
-      const newAvgBuyPrice = totalCost / totalQuantity;
+      const totalCost = existingAvgPrice * existingQty + price * quantity;
+      const totalQuantity = existingQty + quantity;
+      const newAvgBuyPrice = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
       return {
         ...prev,
@@ -107,9 +110,13 @@ function App() {
   };
 
   const handleSell = (symbol, price, quantity) => {
-    const existing = holdings[symbol];
+    if (!price || price <= 0) {
+      alert("Price unavailable right now, try again in a moment.");
+      return;
+    }
 
-    const currentlyOwned = existing?.quantity || 0;
+    const existing = holdings[symbol];
+    const currentlyOwned = Number(existing?.quantity) || 0;
 
     if (quantity > currentlyOwned) {
       alert("You don't own that many shares");
@@ -131,7 +138,7 @@ function App() {
         ...prev,
         [symbol]: {
           quantity: remaining,
-          avgBuyPrice: existing.avgBuyPrice,
+          avgBuyPrice: Number(existing.avgBuyPrice) || 0,
         },
       };
     });
@@ -202,4 +209,3 @@ function App() {
 }
 
 export default App;
-
