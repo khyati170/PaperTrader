@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { getStocks } from "./data/stocks.js";
 import BuySellForm from "./components/BuySellForm.jsx";
 import "./stockDetail.css";
+import MarketStatusBanner from "./components/MarketStatusBanner.jsx";
 
 function StockDetail({ balance, holdings, onBuy, onSell }) {
     const { symbol } = useParams();
@@ -50,6 +51,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
 
     return (
         <main className="stock-detail">
+            <MarketStatusBanner/>
             <section className="stock-header">
                 <div>
                     <p className="stock-symbol">{stock.symbol}</p>

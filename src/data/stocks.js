@@ -176,7 +176,7 @@ export async function getStocks() {
       const data = await response.json();
 
       stocks.push({
-        symbol: stockData.name,
+        symbol: stockData.symbol,
         name: stockData.name,
         sector: sectors[stockData.symbol],
         price: data.c,

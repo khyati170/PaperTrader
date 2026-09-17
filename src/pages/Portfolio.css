@@ -1,96 +1,125 @@
 .portfolio-page {
-  max-width: 1000px;
+  padding: 40px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 32px 20px 60px;
 }
 
-.portfolio-page h1 {
-  color: var(--color-heading);
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 24px;
+.portfolio-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.market-btn {
+  background-color: var(--color-heading);
+  color: var(--color-bg);
+  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+}
+
+.market-btn:hover {
+  opacity: 0.85;
 }
 
 .portfolio-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
-  margin-bottom: 32px;
+  margin: 24px 0 40px;
 }
 
 .summary-card {
-  background: var(--color-bg-alt);
-  padding: 20px 22px;
-  border-radius: 14px;
+  background-color: var(--color-bg-alt);
+  border-radius: 12px;
+  padding: 20px;
 }
 
-.summary-card .label {
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.summary-label {
   color: var(--color-eyebrow);
-  margin: 0 0 8px;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
 }
 
-.summary-card .value {
-  font-size: 22px;
-  font-weight: 700;
+.summary-value {
   color: var(--color-heading);
-  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
-.portfolio-table-wrap {
-  background: var(--color-bg-alt);
-  border-radius: 14px;
-  padding: 8px 24px;
+.holdings-table-wrap {
   overflow-x: auto;
 }
 
-.portfolio-table {
+.holdings-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.portfolio-table th,
-.portfolio-table td {
-  padding: 16px 12px;
+.holdings-table th {
   text-align: left;
-  font-size: 14px;
-  color: var(--color-subheading);
-  border-bottom: 1px solid var(--color-bg);
-}
-
-.portfolio-table th {
   color: var(--color-eyebrow);
-  font-size: 12px;
+  font-size: 0.8rem;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-bg-alt);
+}
+
+.holdings-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--color-bg-alt);
+  font-size: 0.9rem;
+  color: var(--color-subheading);
+}
+
+.symbol-cell {
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.portfolio-table tr:last-child td {
-  border-bottom: none;
-}
-
-.portfolio-table td:not(:first-child) {
-  text-align: right;
-}
-.portfolio-table th:not(:first-child) {
-  text-align: right;
-}
-
-.portfolio-table a {
   color: var(--color-heading);
-  font-weight: 600;
-  text-decoration: none;
-}
-.portfolio-table a:hover {
-  color: var(--color-accent);
 }
 
-.portfolio-empty {
+.sell-cell {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.sell-qty-input {
+  width: 55px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-bg-alt);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background-color: var(--color-bg);
+  color: var(--color-heading);
+}
+
+.sell-btn {
+  background-color: var(--color-loss);
+  color: white;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.sell-btn:hover {
+  opacity: 0.85;
+}
+
+.empty-state {
+  color: var(--color-eyebrow);
   text-align: center;
-  padding: 40px 20px;
+  padding: 40px 0;
+}
+
+.portfolio-loading {
+  text-align: center;
+  padding: 60px 0;
   color: var(--color-eyebrow);
 }

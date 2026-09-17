@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import { isMarketOpen,getMarketStatusMessage } from "./config/marketConfig.js";
 import Navbar from "./components/navbar";
 
 import Home from "./pages/Home";
@@ -62,6 +62,10 @@ function App() {
   };
 
   const handleBuy = (symbol, price, quantity) => {
+    if(!isMarketOpen()){
+      alert(getMarketStatusMessage());
+      return;
+    }
     if (!price || price <= 0) {
       alert("Price unavailable right now, try again in a moment.");
       return;
@@ -108,6 +112,10 @@ function App() {
   };
 
   const handleSell = (symbol, price, quantity) => {
+    if(!isMarketOpen()){
+      alert(getMarketStatusMessage());
+      return;
+    }
     if (!price || price <= 0) {
       alert("Price unavailable right now, try again in a moment.");
       return;
@@ -198,6 +206,7 @@ function App() {
             <Portfolio
               balance={balance}
               holdings={holdings}
+              onSell={handleSell}
             />
           }
         />

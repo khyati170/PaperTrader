@@ -13,6 +13,8 @@ function Footer() {
           <Link to="/">Home</Link>
           <Link to="/market">Market</Link>
           <Link to="/watchlist">Watchlist</Link>
+          <Link to="/portfolio">Portfolio</Link>
+          <Link to="/login">Login</Link>
         </div>
       </div>
 
