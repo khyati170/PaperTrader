@@ -167,7 +167,7 @@ a {
 
   color: var(--color-eyebrow);
 
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 500;
 
   white-space: nowrap;
@@ -242,7 +242,7 @@ a {
 
   color: var(--color-accent);
 
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
   transition:
     background-color 0.2s ease,
@@ -272,7 +272,7 @@ a {
   border-radius: 10px;
 
   color: var(--color-heading);
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
 
   transition:
