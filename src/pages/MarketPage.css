@@ -1,155 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap');
+
 .market-page {
-  padding: 2rem;
+  padding: 2rem 2.5rem 4rem;
   background-color: var(--color-bg);
+  font-family: 'Public Sans', sans-serif;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-/* Header */
+/* ===== Header ===== */
 
 .market-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 24px;
 }
 
 .market-header h1 {
   color: var(--color-heading);
-  font-size: 1.8rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-/* Market Layout */
+/* ===== Market Layout ===== */
 
 .market-body {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 20px;
+  grid-template-columns: 240px 1fr;
+  gap: 28px;
+  align-items: start;
 }
 
-/* Filter Sidebar */
+/* ===== Filter Sidebar ===== */
 
 .filter-sidebar {
   background: var(--color-bg-alt);
+  border: 1px solid var(--navbar-border);
   border-radius: 14px;
-  padding: 16px;
-  height: fit-content;
+  padding: 20px;
+  position: sticky;
+  top: 90px;
 }
 
 .filter-group {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--navbar-border);
+}
+
+.filter-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .filter-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-subheading);
-  margin-bottom: 8px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-eyebrow);
+  margin-bottom: 14px;
 }
 
 .filter-group label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--color-eyebrow);
-  margin-bottom: 6px;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: var(--color-subheading);
+  margin-bottom: 10px;
+  cursor: pointer;
 }
 
-/* Price Range */
+.filter-group input[type="checkbox"] {
+  accent-color: var(--color-accent);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
 
 .filter-group input[type="range"] {
   width: 100%;
+  accent-color: var(--color-accent);
+  margin-bottom: 8px;
 }
 
-/* Sort */
+.filter-group > p {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
+  color: var(--color-eyebrow);
+}
 
 .filter-group select {
   width: 100%;
-  padding: 7px;
-  border: none;
+  padding: 9px 10px;
+  border: 1px solid var(--navbar-border);
   border-radius: 8px;
   background: var(--color-bg);
   color: var(--color-subheading);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
 }
 
-/* Stock Grid */
+/* ===== Stock Grid ===== */
 
 .stock-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
-/* Stock Card */
+/* ===== Stock Card ===== */
 
 .stock-card {
   background: var(--color-bg-alt);
+  border: 1px solid var(--navbar-border);
   border-radius: 14px;
-  padding: 16px;
-  transition: transform 0.2s ease;
+  padding: 20px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .stock-card:hover {
-  transform: scale(1.02);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px var(--navbar-shadow);
+  border-color: var(--color-accent);
 }
 
 .stock-heading h3 {
   color: var(--color-heading);
-  font-size: 1rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .stock-heading p {
   color: var(--color-eyebrow);
-  font-size: 0.8rem;
-  margin-bottom: 8px;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.78rem;
+  margin-bottom: 14px;
 }
 
 .stock-price p {
-  color: var(--color-subheading);
+  color: var(--color-heading);
+  font-family: 'Public Sans', sans-serif;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  margin-bottom: 2px;
 }
 
-/* High / Low / Opening Prices */
+/* ===== High / Low / Opening Prices ===== */
 
 .prices {
-  margin-top: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--navbar-border);
 }
 
 .prices p {
   color: var(--color-eyebrow);
-  font-size: 0.8rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.76rem;
   margin: 4px 0;
+  display: flex;
+  justify-content: space-between;
 }
 
-/* Positive / Negative */
+/* ===== Positive / Negative ===== */
 
 .positive {
-  color: green;
+  color: var(--color-gain);
+  font-family: 'Public Sans', sans-serif;
   font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .negative {
-  color: red;
+  color: var(--color-loss);
+  font-family: 'Public Sans', sans-serif;
   font-weight: 600;
+  font-size: 0.9rem;
 }
 
-/* Buttons */
+/* ===== Buttons ===== */
 
 .stock-action {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .stock-action button {
   flex: 1;
   border: none;
-  border-radius: 40px;
-  padding: 8px 0;
-  font-size: 12px;
-  font-family: 'Poppins', sans-serif;
+  border-radius: 8px;
+  padding: 9px 0;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.stock-action button:active {
+  transform: scale(0.97);
 }
 
 .view-stock {
@@ -167,48 +232,109 @@
   color: var(--color-accent);
 }
 
+.watchlist:hover {
+  background: rgba(15, 76, 76, 0.06);
+}
+
 .watchlist.active {
   background: var(--color-accent);
   color: var(--color-bg);
 }
 
-/* Mobile */
+/* ===== Mobile ===== */
 
-@media (max-width: 768px) {
-  .market-body {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .stock-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
+@media (max-width: 768px) {
+  .market-page {
+    padding: 1.2rem;
+  }
 
+  .market-body {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 
+  .filter-sidebar {
+    position: static;
+  }
 
-/* --- Skeleton loading state --- */
+  .stock-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gainers-losers-widget {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* ===== Skeleton loading state ===== */
 
 .skeleton-line {
-  background: linear-gradient(90deg, var(--color-bg) 25%, #e5ddc8 50%, var(--color-bg) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg) 25%,
+    #e5ddc8 50%,
+    var(--color-bg) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s infinite;
   border-radius: 6px;
   height: 12px;
 }
 
-.skeleton-title { height: 16px; width: 60%; margin-bottom: 8px; }
-.skeleton-subtitle { width: 80%; margin-bottom: 14px; }
-.skeleton-price { height: 18px; width: 50%; margin-bottom: 8px; }
-.skeleton-change { width: 30%; margin-bottom: 14px; }
-.skeleton-mini { width: 90%; margin-bottom: 6px; }
+.skeleton-title {
+  height: 16px;
+  width: 60%;
+  margin-bottom: 8px;
+}
+
+.skeleton-subtitle {
+  width: 80%;
+  margin-bottom: 14px;
+}
+
+.skeleton-price {
+  height: 18px;
+  width: 50%;
+  margin-bottom: 8px;
+}
+
+.skeleton-change {
+  width: 30%;
+  margin-bottom: 14px;
+}
+
+.skeleton-mini {
+  width: 90%;
+  margin-bottom: 6px;
+}
 
 .stock-action .skeleton-btn {
   flex: 1;
   height: 30px;
-  border-radius: 40px;
-  background: linear-gradient(90deg, var(--color-bg) 25%, #e5ddc8 50%, var(--color-bg) 75%);
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg) 25%,
+    #e5ddc8 50%,
+    var(--color-bg) 75%
+  );
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.4s infinite;
 }
 
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }

@@ -1,10 +1,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap');
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Libre Baskerville', serif;
+  font-family: 'Schibsted Grotesk', serif;
 }
 
 :root {
@@ -26,7 +28,7 @@
   --color-bg: #24292b;
   --color-bg-alt: #2e3436;
   --color-heading: #f0f5f3;
-  --color-eyebrow: #a3bdb9;
+  --color-eyebrow: #409b8e;
   --color-subheading: #e0e9e6;
   --color-gain: #3fc49b;
   --color-loss: #e88a73;
@@ -126,9 +128,9 @@ a {
 .logo a {
   color: var(--color-heading);
 
-  font-size: 1.12rem;
+  font-size: 1.3rem;
   font-weight: 700;
-
+  
   letter-spacing: -0.3px;
 
   transition: color 0.2s ease;
@@ -165,7 +167,7 @@ a {
 
   color: var(--color-eyebrow);
 
-  font-size: 0.88rem;
+  font-size: 1.2rem;
   font-weight: 500;
 
   white-space: nowrap;
@@ -215,7 +217,7 @@ a {
 
   color: var(--color-gain);
 
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   font-weight: 600;
 
   background-color: rgba(15, 110, 86, 0.04);
@@ -224,7 +226,7 @@ a {
 .balance-label {
   color: var(--color-eyebrow);
 
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 500;
 }
 
@@ -240,7 +242,7 @@ a {
 
   color: var(--color-accent);
 
-  font-size: 0.86rem;
+  font-size: 1.2rem;
   font-weight: 600;
   transition:
     background-color 0.2s ease,
@@ -270,7 +272,7 @@ a {
   border-radius: 10px;
 
   color: var(--color-heading);
-  font-size: 1rem;
+  font-size: 1.2rem;
   cursor: pointer;
 
   transition:
@@ -373,23 +375,19 @@ a {
 
 .content h1 {
   color: var(--color-bg);
-
+  font-family: 'Schibsted Grotesk', sans-serif;
+  font-weight: 1100;
   opacity: 0;
-
   transform: translateY(40px);
-
   animation: fadeUp 1s ease forwards;
 }
 
 .content h2 {
   color: var(--color-eyebrow);
-
-  font-weight: 400;
-
-  opacity: 0;
-
+  font-family: 'Schibsted Grotesk', sans-serif;
+  font-weight: 500;
+  opacity: 6;
   transform: translateY(40px);
-
   animation: fadeUp 1s ease forwards;
   animation-delay: 0.4s;
 }
@@ -413,12 +411,12 @@ a {
   background-color: var(--color-accent);
 
   color: var(--color-bg);
-
+  font-weight: 600;
   text-decoration: none;
 
   font-size: 1.5rem;
 
-  border-radius: 40px;
+  border-radius: 10px;
 
   transition:
     background-color 0.4s ease,
@@ -498,24 +496,29 @@ a {
   font-weight: 600;
 }
 
+
 .how-it-works {
-  padding: 60px 40px;
+  padding: 60px 40px 70px;
   text-align: center;
+  font-size: 1.7rem;
 }
 
 .steps-grid {
   display: grid;
-
   grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 35px auto 0;
+}
 
-  gap: 24px;
-
-  margin-top: 32px;
+.step {
+  padding: 28px 20px;
+  text-align: center;
 }
 
 .step-number {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
 
   border-radius: 50%;
 
@@ -527,6 +530,7 @@ a {
   align-items: center;
   justify-content: center;
 
+  font-size: 1.2rem;
   font-weight: 600;
 
   margin: 0 auto 12px;
@@ -535,19 +539,21 @@ a {
 .step h3 {
   color: var(--color-subheading);
 
-  font-size: 1rem;
+  font-size: 1.4rem;
 
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .step p {
   color: var(--color-eyebrow);
 
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
+
 .features-section {
   padding: 80px 40px;
-
+  font-size: 1.7rem;
   text-align: center;
 
   background-color: var(--color-bg);
@@ -556,7 +562,7 @@ a {
 .section-subheading {
   color: var(--color-eyebrow);
 
-  font-size: 0.95rem;
+  font-size: 1.4rem;
 
   margin-bottom: 48px;
 }
@@ -607,7 +613,7 @@ a {
   align-items: center;
   justify-content: center;
 
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 
   margin-bottom: 16px;
 }
@@ -615,7 +621,7 @@ a {
 .feature-card h3 {
   color: var(--color-subheading);
 
-  font-size: 1.05rem;
+  font-size: 1.2rem;
 
   margin-bottom: 8px;
 }
@@ -623,7 +629,7 @@ a {
 .feature-card p {
   color: var(--color-eyebrow);
 
-  font-size: 0.9rem;
+  font-size: 1rem;
 
   line-height: 1.5;
 }
@@ -639,7 +645,7 @@ a {
 .final-cta h2 {
   color: var(--color-heading);
 
-  font-size: 1.8rem;
+  font-size: 1.7rem;
 
   margin-bottom: 10px;
 }
@@ -647,9 +653,10 @@ a {
 .final-cta p {
   color: var(--color-eyebrow);
 
+  font-size: 1.4rem;
+
   margin-bottom: 24px;
 }
-
 
 .footer {
   background-color: var(--color-heading);
@@ -675,7 +682,7 @@ a {
 }
 
 .footer-logo {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
 
   font-weight: bold;
 
@@ -685,7 +692,7 @@ a {
 .footer-tagline {
   color: var(--color-eyebrow);
 
-  font-size: 0.85rem;
+  font-size: 1.1rem;
 
   margin-top: 6px;
 }
@@ -701,7 +708,7 @@ a {
 
   text-decoration: none;
 
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 
   transition: color 0.3s ease;
 }
@@ -725,10 +732,8 @@ a {
 .footer-bottom p {
   color: var(--color-eyebrow);
 
-  font-size: 0.75rem;
+  font-size: 0.90rem;
 }
-
-
 
 @media (max-width: 900px) {
   .bar {
@@ -876,4 +881,3 @@ a {
     font-size: 0.95rem;
   }
 }
-

@@ -2,6 +2,7 @@
   padding: 40px;
   max-width: 1100px;
   margin: 0 auto;
+  font-family: 'Public Sans', sans-serif;
 }
 
 .portfolio-heading {
@@ -11,14 +12,23 @@
   margin-bottom: 16px;
 }
 
+.portfolio-heading h1 {
+  color: var(--color-heading);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
 .market-btn {
   background-color: var(--color-heading);
   color: var(--color-bg);
   text-decoration: none;
   padding: 9px 16px;
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
   transition: opacity 0.2s ease;
 }
 
@@ -41,13 +51,16 @@
 
 .summary-label {
   color: var(--color-eyebrow);
-  font-size: 0.85rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
   margin-bottom: 6px;
 }
 
 .summary-value {
   color: var(--color-heading);
-  font-size: 1.4rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
@@ -58,12 +71,15 @@
 .holdings-table {
   width: 100%;
   border-collapse: collapse;
+  font-family: 'Public Sans', sans-serif;
 }
 
 .holdings-table th {
   text-align: left;
   color: var(--color-eyebrow);
+  font-family: 'Public Sans', sans-serif;
   font-size: 0.8rem;
+  font-weight: 600;
   padding: 10px 12px;
   border-bottom: 1px solid var(--color-bg-alt);
 }
@@ -71,11 +87,14 @@
 .holdings-table td {
   padding: 12px;
   border-bottom: 1px solid var(--color-bg-alt);
-  font-size: 0.9rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.88rem;
   color: var(--color-subheading);
 }
 
 .symbol-cell {
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--color-heading);
 }
@@ -91,7 +110,8 @@
   padding: 6px 8px;
   border: 1px solid var(--color-bg-alt);
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
   background-color: var(--color-bg);
   color: var(--color-heading);
 }
@@ -102,8 +122,9 @@
   border: none;
   padding: 7px 14px;
   border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
@@ -114,7 +135,9 @@
 
 .empty-state {
   color: var(--color-eyebrow);
+  font-family: 'Public Sans', sans-serif;
   text-align: center;
+  font-size: 0.9rem;
   padding: 40px 0;
 }
 
@@ -122,4 +145,6 @@
   text-align: center;
   padding: 60px 0;
   color: var(--color-eyebrow);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.9rem;
 }
