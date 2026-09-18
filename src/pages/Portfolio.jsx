@@ -21,17 +21,27 @@ function Portfolio({ balance, holdings, onSell }) {
   const holdingSymbols = Object.keys(holdings);
 
   // attach live current price to each holding
-  const enrichedHoldings = holdingSymbols.map((symbol) => {
-    const { quantity, avgBuyPrice } = holdings[symbol];
+  // const enrichedHoldings = holdingSymbols.map((symbol) => {
+  //   const { quantity, avgBuyPrice } = holdings[symbol];
+  //   const liveStock = stocks.find((s) => s.symbol === symbol);
+  //   const currentPrice = liveStock ? liveStock.price : avgBuyPrice;
+  const enrichedHoldings = holdingSymbols
+  .map((symbol) => {
+    const quantity = Number(holdings[symbol]?.quantity) || 0;
+    const avgBuyPrice = Number(holdings[symbol]?.avgBuyPrice) || 0;
+
+    if (quantity <= 0) return null;
+
     const liveStock = stocks.find((s) => s.symbol === symbol);
-    const currentPrice = liveStock ? liveStock.price : avgBuyPrice;
+    const currentPrice = liveStock ? Number(liveStock.price) || avgBuyPrice : avgBuyPrice;
     const currentValue = currentPrice * quantity;
     const investedValue = avgBuyPrice * quantity;
     const gain = currentValue - investedValue;
     const gainPercent = investedValue > 0 ? (gain / investedValue) * 100 : 0;
 
     return { symbol, quantity, avgBuyPrice, currentPrice, currentValue, gain, gainPercent };
-  });
+  })
+  .filter(Boolean);
 
   const totalCurrentValue = enrichedHoldings.reduce((sum, h) => sum + h.currentValue, 0);
   const totalInvested = enrichedHoldings.reduce((sum, h) => sum + h.avgBuyPrice * h.quantity, 0);

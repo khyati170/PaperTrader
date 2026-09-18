@@ -139,15 +139,18 @@ const sectors = {
 };
 
 let stocksPromise = null;
+const CACHE_DURATION_MS = 60 * 1000;
 
 export async function getStocks() {
 
   const savedStocks = sessionStorage.getItem("stocks");
+  const savedTimestamp = sessionStorage.getItem("stocksTimestamp");
 
-  if (savedStocks) {
+  if (savedStocks && savedTimestamp) {
+    const isExpired = Date.now()-Number(savedTimestamp) > CACHE_DURATION_MS;
     const parsedStocks = JSON.parse(savedStocks);
 
-    if (parsedStocks.length > 0) {
+    if (!isExpired && parsedStocks.length > 0) {
       console.log("Using cached stocks");
       return parsedStocks;
     }
@@ -190,6 +193,7 @@ export async function getStocks() {
 
     if (stocks.length === stocksData.length) {
       sessionStorage.setItem("stocks", JSON.stringify(stocks));
+      sessionStorage.setItem("stocksTimestamp", Date.now().toString());
       console.log("Stocks saved to sessionStorage");
     } else {
       console.log("Some stocks failed, so cache was not saved");
