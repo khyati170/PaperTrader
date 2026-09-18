@@ -21,5 +21,5 @@ export function isMarketOpen() {
 }
 
 export function getMarketStatusMessage() {
-  return "The stock market is currently closed. Trading hours are 9:00 AM – 3:30 PM (Mon–Fri). You can still browse stocks, but buy/sell is disabled until it reopens.";
+  return " The stock market is currently closed. Trading hours are 9:00 AM – 3:30 PM (Mon–Fri). You can still browse stocks, but buy/sell is disabled until it reopens.";
 }
