@@ -5,10 +5,10 @@ import HowItworks from "../components/HowItworks";
 import FinalCTA from "../components/FinalCTA";
 import Footer from "../components/Footer";
 
-function Home() {
+function Home({ isAuthenticated }) {
   return (
     <>
-      <Hero />
+      <Hero isAuthenticated={isAuthenticated} />
       <HowItworks />
       <FeatureSection/>
       <FinalCTA/>

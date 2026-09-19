@@ -1,10 +1,16 @@
 
 import { useState } from "react";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import ThemeToggle from "./ThemeToggle";
 
 function Navbar({ isAuthenticated, balance, onLogout }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogoutClick = () => {
+    onLogout();
+    navigate("/login");
+  };
 
   return (
     <nav className="bar">
@@ -60,7 +66,7 @@ function Navbar({ isAuthenticated, balance, onLogout }) {
 
             <button
               className="logout-button"
-              onClick={onLogout}
+              onClick={handleLogoutClick}
             >
               Logout
             </button>

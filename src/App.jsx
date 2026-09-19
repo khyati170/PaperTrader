@@ -218,8 +218,6 @@
 // export default App;
 
 
-
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -244,7 +242,6 @@ function App() {
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
- 
 
   const [balance, setBalance] = useState(() => {
     const saved = localStorage.getItem("balance");
@@ -287,7 +284,6 @@ function App() {
   // LOGIN
   const handleLogin = (userData) => {
     setIsAuthenticated(true);
-
     setBalance(userData.balance ?? 50000);
 
     // Convert demo holdings array into the format
@@ -312,6 +308,14 @@ function App() {
       "accountType",
       userData.isDemo ? "demo" : "normal"
     );
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setBalance(0);
+    setHoldings({});
+    setWatchlist([]);
+    localStorage.removeItem("accountType");
   };
 
   // BUY
@@ -371,14 +375,7 @@ function App() {
     });
   };
 
- const handleLogout = () => {
-    setIsAuthenticated(false);
-    setBalance(0);
-    setHoldings({});
-    setWatchlist([]);
- }
-
-
+  // SELL
   const handleSell = (symbol, price, quantity) => {
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
@@ -391,7 +388,6 @@ function App() {
     }
 
     const existing = holdings[symbol];
-
     const currentlyOwned = Number(existing?.quantity) || 0;
 
     if (quantity > currentlyOwned) {
@@ -430,11 +426,6 @@ function App() {
       />
 
       <Routes>
-        <Route
-          path="/"
-          element={<Home />}
-        />
-
         <Route
           path="/market"
           element={
@@ -482,10 +473,17 @@ function App() {
             />
           }
         />
+        <Route
+          path="/"
+          element={
+            <Home
+              isAuthenticated={isAuthenticated} 
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-

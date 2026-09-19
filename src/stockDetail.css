@@ -524,13 +524,13 @@ tr:last-child td {
     color: var(--color-subheading);
 }
 
-
+/* 
 .demo-divider {
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 20px 0 14px;
-    color: #888;
+    color: var(--color-eyebrow);
     font-size: 12px;
     font-weight: 500;
 }
@@ -540,7 +540,7 @@ tr:last-child td {
     content: "";
     flex: 1;
     height: 1px;
-    background: #ddd;
+    background: var(--color-bg-alt);
 }
 
 .demo-divider span {
@@ -576,9 +576,9 @@ tr:last-child td {
     padding: 12px 16px;
 
     background: transparent;
-    color: #333;
+    color: var(--color-subheading);
 
-    border: 1px solid #cfcfcf;
+    border: 1px solid var(--color-bg-alt);
     border-radius: 8px;
 
     font-size: 14px;
@@ -589,8 +589,8 @@ tr:last-child td {
 }
 
 .demo-login-button:hover {
-    background: #f5f5f5;
-    border-color: #aaa;
+    background: var(--color-bg-alt);
+    border-color: var(--color-accent);
     transform: translateY(-1px);
 }
 
@@ -627,6 +627,76 @@ body.dark .demo-login-button {
 }
 
 
+
+@media (max-width: 480px) {
+    .auth-page::before,
+    .auth-page::after {
+        width: 250px;
+        height: 250px;
+    }
+
+    .auth-form {
+        padding: 22px 20px 26px;
+    }
+} */
+
+
+.demo-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 14px;
+    color: var(--color-eyebrow);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.demo-divider::before,
+.demo-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--color-bg-alt);
+}
+
+.demo-divider span {
+    white-space: nowrap;
+}
+
+.demo-login-button {
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    color: var(--color-subheading);
+    border: 1px solid var(--color-bg-alt);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.demo-login-button:hover {
+    background: var(--color-bg-alt);
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+}
+
+.demo-login-button:active {
+    transform: translateY(0);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 @media (max-width: 480px) {
     .auth-page::before,
