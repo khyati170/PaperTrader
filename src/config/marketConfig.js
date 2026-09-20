@@ -1,4 +1,4 @@
-export const ENFORCE_MARKET_HOURS = false;
+export const ENFORCE_MARKET_HOURS = true;
 
 const MARKET_OPEN_HOUR = 9;
 const MARKET_OPEN_MINUTE = 0;
