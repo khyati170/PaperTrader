@@ -233,6 +233,7 @@ import WatchList from "./pages/WatchList";
 import StockDetail from "./StockDetail.jsx";
 import Login from "./pages/Login.jsx";
 import Portfolio from "./pages/Portfolio.jsx";
+import Lessons from "./pages/lessons.jsx";
 
 
 function App() {
@@ -481,6 +482,10 @@ function App() {
             />
           }
         />
+        <Route
+          path="/lessons"
+          element={<Lessons />}/>
+     
       </Routes>
     </BrowserRouter>
   );

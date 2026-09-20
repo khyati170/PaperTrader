@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getStocks } from "./data/stocks.js";
 import BuySellForm from "./components/BuySellForm.jsx";
 import "./stockDetail.css";
-import MarketStatusBanner from "./components/MarketStatusBanner.jsx";
 
 function StockDetail({ balance, holdings, onBuy, onSell }) {
     const { symbol } = useParams();
+    const navigate = useNavigate();
 
     const [stock, setStock] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         let isMounted = true;
@@ -25,14 +28,27 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
         return () => { isMounted = false; };
     }, [symbol]);
 
+    // How many shares of THIS specific stock the user owns
     const ownedShares = holdings[symbol]?.quantity || 0;
 
     const handleBuy = (stockArg, quantity) => {
         onBuy(stockArg.symbol, stockArg.price, quantity);
+        setSuccessMessage("You've successfully bought the shares.");
+        setShowSuccess(true);
+
+        setTimeout(() => {
+            navigate("/portfolio");
+        }, 3500);
     };
 
     const handleSell = (stockArg, quantity) => {
         onSell(stockArg.symbol, stockArg.price, quantity);
+        setSuccessMessage("You've successfully sold the shares.");
+        setShowSuccess(true);
+
+        setTimeout(() => {
+            navigate("/portfolio");
+        }, 3500);
     };
 
     if (loading) {
@@ -51,7 +67,18 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
 
     return (
         <main className="stock-detail">
-            <MarketStatusBanner/>
+
+            {showSuccess && (
+                <div className="success-overlay">
+                    <div className="success-box">
+                        <span className="success-icon">✅</span>
+                        <h2>Success!</h2>
+                        <p>{successMessage}</p>
+                        <p className="success-subtext">Redirecting to your portfolio...</p>
+                    </div>
+                </div>
+            )}
+
             <section className="stock-header">
                 <div>
                     <p className="stock-symbol">{stock.symbol}</p>

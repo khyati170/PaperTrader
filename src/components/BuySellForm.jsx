@@ -9,6 +9,13 @@ function BuySellForm({ stock, ownedShares, onBuy, onSell }) {
 
     const handleBuy = () => {
         if (buyQtyNumber <= 0) return;
+
+        const confirmed = window.confirm(
+            `This will deduct $${totalCost.toFixed(2)} from your virtual wallet. Are you sure?`
+        );
+
+        if (!confirmed) return;
+
         onBuy(stock, buyQtyNumber);
         setBuyQuantity("");
     };
@@ -16,6 +23,15 @@ function BuySellForm({ stock, ownedShares, onBuy, onSell }) {
     const handleSell = () => {
         const sellQtyNumber = Number(sellQuantity) || 0;
         if (sellQtyNumber <= 0) return;
+
+        const saleValue = sellQtyNumber * stock.price;
+
+        const confirmed = window.confirm(
+            `You will receive $${saleValue.toFixed(2)} from selling ${sellQtyNumber} share(s) of ${stock.symbol}. Are you sure?`
+        );
+
+        if (!confirmed) return;
+
         onSell(stock, sellQtyNumber);
         setSellQuantity("");
     };
