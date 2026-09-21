@@ -93,7 +93,7 @@
 //         };
 //       }
 
-      
+
 //       const existingQty = Number(existing.quantity) || 0;
 //       const existingAvgPrice = Number(existing.avgBuyPrice) || 0;
 
@@ -477,7 +477,7 @@ function App() {
           path="/"
           element={
             <Home
-              isAuthenticated={isAuthenticated} 
+              isAuthenticated={isAuthenticated}
             />
           }
         />

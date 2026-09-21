@@ -25,7 +25,7 @@
 //         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 //         return emailRegex.test(email);
 //     };
-    
+
 //     const getUsers = () => {
 //         const saved = localStorage.getItem("users");
 //         return saved ? JSON.parse(saved) : [];
@@ -53,7 +53,7 @@
 //     }, 1800);
 // };
 
-    
+
 
 //     const handleSignup = (e) => {
 //         e.preventDefault();
@@ -135,7 +135,7 @@
 //     const handleDemoLogin = () => {
 //     completeLogin(demoAccount);
 // };
-    
+
 
 
 //     return (
@@ -465,18 +465,16 @@ function Login({ onLogin }) {
             <div className="auth-card">
                 <div className="auth-tabs">
                     <button
-                        className={`auth-tab ${
-                            mode === "login" ? "active" : ""
-                        }`}
+                        className={`auth-tab ${mode === "login" ? "active" : ""
+                            }`}
                         onClick={() => setMode("login")}
                     >
                         Log In
                     </button>
 
                     <button
-                        className={`auth-tab ${
-                            mode === "signup" ? "active" : ""
-                        }`}
+                        className={`auth-tab ${mode === "signup" ? "active" : ""
+                            }`}
                         onClick={() => setMode("signup")}
                     >
                         Sign Up

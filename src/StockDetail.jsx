@@ -54,7 +54,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
     if (loading) {
         return <p className="loading-text">Loading {symbol}...</p>;
     }
-
+    
     if (!stock) {
         return (
             <div className="stock-detail">
