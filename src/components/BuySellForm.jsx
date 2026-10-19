@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { isMarketOpen, getMarketStatusMessage } from "../config/marketConfig";
 
 function BuySellForm({ stock, ownedShares, onBuy, onSell }) {
     const [buyQuantity, setBuyQuantity] = useState("");
@@ -7,6 +8,10 @@ function BuySellForm({ stock, ownedShares, onBuy, onSell }) {
     const buyQtyNumber = Number(buyQuantity) || 0;
     const totalCost = buyQtyNumber * stock.price;
 
+    if(!isMarketOpen()){
+        alert(getMarketStatusMessage());
+        return ;
+    }
     const handleBuy = () => {
         if (buyQtyNumber <= 0) return;
 
@@ -19,7 +24,11 @@ function BuySellForm({ stock, ownedShares, onBuy, onSell }) {
         onBuy(stock, buyQtyNumber);
         setBuyQuantity("");
     };
-
+    
+    if(!isMarketOpen()){
+        alert(getMarketStatusMessage());
+        return ;
+    }
     const handleSell = () => {
         const sellQtyNumber = Number(sellQuantity) || 0;
         if (sellQtyNumber <= 0) return;

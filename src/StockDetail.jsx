@@ -32,7 +32,9 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
     const ownedShares = holdings[symbol]?.quantity || 0;
 
     const handleBuy = (stockArg, quantity) => {
-        onBuy(stockArg.symbol, stockArg.price, quantity);
+        const success = onBuy(stockArg.symbol, stockArg.price, quantity);
+        if (!success) return;
+
         setSuccessMessage("You've successfully bought the shares.");
         setShowSuccess(true);
 
@@ -42,7 +44,9 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
     };
 
     const handleSell = (stockArg, quantity) => {
-        onSell(stockArg.symbol, stockArg.price, quantity);
+        const success = onSell(stockArg.symbol, stockArg.price, quantity);
+        if (!success) return;
+        
         setSuccessMessage("You've successfully sold the shares.");
         setShowSuccess(true);
 

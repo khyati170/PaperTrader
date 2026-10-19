@@ -323,19 +323,19 @@ function App() {
   const handleBuy = (symbol, price, quantity) => {
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
-      return;
+      return false;
     }
 
     if (!price || price <= 0) {
       alert("Price unavailable right now, try again in a moment.");
-      return;
+      return false;
     }
 
     const cost = price * quantity;
 
     if (cost > balance) {
       alert("Insufficient balance");
-      return;
+      return false;
     }
 
     setBalance((prev) => prev - cost);
@@ -374,18 +374,19 @@ function App() {
         },
       };
     });
+    return true;
   };
 
   // SELL
   const handleSell = (symbol, price, quantity) => {
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
-      return;
+      return false;
     }
 
     if (!price || price <= 0) {
       alert("Price unavailable right now, try again in a moment.");
-      return;
+      return false;
     }
 
     const existing = holdings[symbol];
@@ -393,7 +394,7 @@ function App() {
 
     if (quantity > currentlyOwned) {
       alert("You don't own that many shares");
-      return;
+      return false;
     }
 
     setBalance((prev) => prev + price * quantity);
@@ -416,6 +417,7 @@ function App() {
         },
       };
     });
+    return true;
   };
 
   return (
