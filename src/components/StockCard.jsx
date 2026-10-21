@@ -125,9 +125,9 @@ export default function StockCard({
   };
 
   const handleWatchlist = (e) => {
-    e.stopPropagation();
-    onWatchlistClick?.();
-  };
+  e.stopPropagation();
+  onWatchlistClick?.(e);
+};
 
   return (
     <div className="stock-card">

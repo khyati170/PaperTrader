@@ -46,21 +46,15 @@ function App() {
     localStorage.setItem("holdings", JSON.stringify(holdings));
   }, [holdings]);
 
-  const addToWatchlist = (symbol) => {
-    setWatchlist((prev) => [...prev, symbol]);
-  };
-
-  const removeFromWatchlist = (symbol) => {
-    setWatchlist((prev) => prev.filter((s) => s !== symbol));
-  };
-
-  const toggleWatchlist = (symbol) => {
-    if (watchlist.includes(symbol)) {
-      removeFromWatchlist(symbol);
-    } else {
-      addToWatchlist(symbol);
+ const toggleWatchlist = (symbol) => {
+  setWatchlist((prev) => {
+    if (prev.includes(symbol)) {
+      return prev.filter((s) => s !== symbol);
     }
-  };
+
+    return [...prev, symbol];
+  });
+};
 
   // LOGIN
   const handleLogin = (userData) => {

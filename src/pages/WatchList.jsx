@@ -6,10 +6,10 @@ function WatchList({ watchlist = [], toggleWatchlist = () => {} }) {
   const [stocks, setStocks] = useState([]);
 
   useEffect(() => {
-    getStocks().then((data) => {
-      setStocks(data);
-    });
-  }, []);
+  getStocks().then((data) => {
+    setStocks(data.stocks || []);
+  });
+}, []);
 
   const watchlistedStocks = stocks.filter((stock) =>
     watchlist.includes(stock.symbol)
