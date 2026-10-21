@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 .market-page {
   padding: 2rem 2.5rem 4rem;
@@ -19,10 +19,65 @@
 
 .market-header h1 {
   color: var(--color-heading);
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Schibsted Grotesk', sans-serif;
   font-size: 2.2rem;
   font-weight: 700;
   letter-spacing: -0.01em;
+}
+
+/* ===== Market tabs (US / India) ===== */
+
+.market-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.market-tab {
+  padding: 10px 20px;
+  border: 1px solid var(--navbar-border);
+  border-radius: 10px;
+  background-color: var(--color-bg-alt);
+  color: var(--color-eyebrow);
+  font-family: 'Schibsted Grotesk', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+}
+
+.market-tab:hover {
+  transform: translateY(-1px);
+}
+
+.market-tab.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ===== Stale / no-data banners ===== */
+
+.stale-badge {
+  display: block;
+  width: fit-content;
+  margin: 0 auto 18px;
+  padding: 8px 14px;
+  background-color: color-mix(in srgb, var(--color-loss) 10%, transparent);
+  border: 1px solid var(--color-loss);
+  border-radius: 8px;
+  color: var(--color-loss);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.no-data-message {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--color-eyebrow);
+  font-size: 0.95rem;
 }
 
 /* ===== Market Layout ===== */
@@ -58,7 +113,7 @@
 }
 
 .filter-title {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'Schibsted Grotesk', sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -92,7 +147,7 @@
 }
 
 .filter-group > p {
-  font-family: 'Public Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.8rem;
   color: var(--color-eyebrow);
 }
@@ -109,6 +164,123 @@
   font-weight: 500;
   cursor: pointer;
 }
+/* Row ke saare cards ki height barabar */
+.stock-grid > a {
+  display: flex;
+}
+
+.stock-grid > a > .stock-card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Both views: body sized by content, not a fixed height */
+.stock-card .sc-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.stock-card .sc-chart {
+  margin: 0;
+}
+
+/* ---- basic stats: 4 rows in a single column ---- */
+.stock-card .sc-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--navbar-border);
+}
+
+.stock-card .sc-stats > div {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--navbar-border) 60%, transparent);
+}
+
+.stock-card .sc-stats > div:last-child {
+  border-bottom: none;
+}
+
+.stock-card .sc-stats span {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-eyebrow);
+}
+
+.stock-card .sc-stats b {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-subheading);
+}
+  
+/* ===== Toolbar (live indicator + Chart/Basic toggle) ===== */
+
+.view-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.view-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-eyebrow);
+}
+
+.view-toggle {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--navbar-border);
+  border-radius: 10px;
+}
+
+.view-btn {
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-eyebrow);
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.view-btn:hover {
+  color: var(--color-heading);
+}
+
+.view-btn.active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.live-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--color-gain);
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(63, 196, 155, 0.5); }
+  50%      { opacity: 0.6; box-shadow: 0 0 0 5px rgba(63, 196, 155, 0); }
+}
 
 /* ===== Stock Grid ===== */
 
@@ -118,130 +290,314 @@
   gap: 16px;
 }
 
-/* ===== Stock Card ===== */
+
+/* cards stagger fade-in */
+.stock-grid > a {
+  opacity: 0;
+  animation: cardIn 0.45s ease forwards;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================== STOCK CARD ===================== */
 
 .stock-card {
   background: var(--color-bg-alt);
   border: 1px solid var(--navbar-border);
-  border-radius: 14px;
-  padding: 20px;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  border-radius: 16px;
+  padding: 18px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .stock-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 24px var(--navbar-shadow);
+  box-shadow: 0 12px 28px var(--navbar-shadow);
   border-color: var(--color-accent);
 }
 
-.stock-heading h3 {
-  color: var(--color-heading);
-  font-family: 'Public Sans', sans-serif;
+/* ---- top row ---- */
+
+.stock-card .sc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.stock-card .sc-heading h3 {
+  font-family: 'Schibsted Grotesk', sans-serif;
   font-size: 1.05rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-}
-
-.stock-heading p {
-  color: var(--color-eyebrow);
-  font-family: 'Public Sans', sans-serif;
-  font-size: 0.78rem;
-  margin-bottom: 14px;
-}
-
-.stock-price p {
   color: var(--color-heading);
-  font-family: 'Public Sans', sans-serif;
-  font-weight: 600;
-  font-size: 1.25rem;
-  margin-bottom: 2px;
+  margin: 0;
 }
 
-/* ===== High / Low / Opening Prices ===== */
-
-.prices {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid var(--navbar-border);
-}
-
-.prices p {
+.stock-card .sc-heading p {
+  font-size: 0.85rem;
   color: var(--color-eyebrow);
-  font-family: 'Public Sans', sans-serif;
-  font-size: 0.76rem;
-  margin: 4px 0;
-  display: flex;
-  justify-content: space-between;
+  margin: 2px 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 170px;
 }
 
-/* ===== Positive / Negative ===== */
-
-.positive {
-  color: var(--color-gain);
-  font-family: 'Public Sans', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.negative {
-  color: var(--color-loss);
-  font-family: 'Public Sans', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-/* ===== Buttons ===== */
-
-.stock-action {
-  display: flex;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.stock-action button {
-  flex: 1;
-  border: none;
-  border-radius: 8px;
-  padding: 9px 0;
-  font-family: 'Public Sans', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.15s ease;
-}
-
-.stock-action button:active {
-  transform: scale(0.97);
-}
-
-.view-stock {
-  background: var(--color-accent);
-  color: var(--color-bg);
-}
-
-.view-stock:hover {
-  background: var(--color-accent-hover);
-}
-
-.watchlist {
+.stock-card .sc-star {
+  appearance: none;
   background: transparent;
-  border: 1.5px solid var(--color-accent) !important;
+  border: none;
+  padding: 2px 4px;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--color-eyebrow);
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.stock-card .sc-star:hover {
+  transform: scale(1.2);
   color: var(--color-accent);
 }
 
-.watchlist:hover {
-  background: rgba(15, 76, 76, 0.06);
+.stock-card .sc-star.active {
+  color: #e0b44c;
 }
 
-.watchlist.active {
-  background: var(--color-accent);
+/* ---- price + pill ---- */
+
+.stock-card .sc-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 10px;
+}
+
+.stock-card .sc-price {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--color-heading);
+  line-height: 1;
+  padding: 2px 4px;
+  margin-left: -4px;
+  border-radius: 6px;
+}
+
+.stock-card .sc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.stock-card .sc-pill.up {
+  color: var(--color-gain);
+  background: color-mix(in srgb, var(--color-gain) 14%, transparent);
+}
+
+.stock-card .sc-pill.down {
+  color: var(--color-loss);
+  background: color-mix(in srgb, var(--color-loss) 14%, transparent);
+}
+
+/* ---- chart ---- */
+
+.stock-card .sc-chart {
+  position: relative;
+  height: 64px;
+  margin: 4px 0 16px;
+  cursor: crosshair;
+}
+
+.stock-card .sc-chart.up   { color: var(--color-gain); }
+.stock-card .sc-chart.down { color: var(--color-loss); }
+
+.stock-card .sc-chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+  animation: chartReveal 0.9s ease-out;
+}
+
+.stock-card .sc-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stock-card .sc-base {
+  stroke: var(--color-eyebrow);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.5;
+}
+
+.stock-card .sc-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  border: 2px solid var(--color-bg-alt);
+  box-sizing: content-box;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.stock-card .sc-dot.live::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: dotPing 1.8s ease-out infinite;
+}
+
+.stock-card .sc-hline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: currentColor;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.stock-card .sc-tip {
+  position: absolute;
+  top: -22px;
+  transform: translateX(-50%);
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--color-heading);
   color: var(--color-bg);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-/* ===== Mobile ===== */
+@keyframes chartReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes dotPing {
+  0%   { transform: scale(1);   opacity: 0.5; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* ---- day range ---- */
+
+.stock-card .sc-track {
+  position: relative;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--navbar-border);
+  margin-bottom: 9px;
+}
+
+.stock-card .sc-marker {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--color-heading);
+  border: 2px solid var(--color-bg-alt);
+  box-sizing: content-box;
+  transform: translate(-50%, -50%);
+  transition: left 0.6s ease;
+}
+
+.stock-card .sc-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--color-subheading);
+}
+
+.stock-card .sc-range-labels em {
+  font-style: normal;
+  color: var(--color-eyebrow);
+  margin-right: 3px;
+}
+
+
+
+/* ===== Price flash (live update) ===== */
+
+.flash-up   { animation: flashUp 1s ease; }
+.flash-down { animation: flashDown 1s ease; }
+
+@keyframes flashUp {
+  0%   { background: rgba(63, 196, 155, 0.35); }
+  100% { background: transparent; }
+}
+
+@keyframes flashDown {
+  0%   { background: rgba(232, 138, 115, 0.35); }
+  100% { background: transparent; }
+}
+
+/* ===== Skeleton loading state ===== */
+
+.skeleton-line {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg) 25%,
+    color-mix(in srgb, var(--color-heading) 10%, var(--color-bg)) 50%,
+    var(--color-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+  border-radius: 6px;
+  height: 12px;
+}
+
+.skeleton-title    { height: 16px; width: 60%; margin-bottom: 8px; }
+.skeleton-subtitle { width: 80%; margin-bottom: 14px; }
+.skeleton-price    { height: 18px; width: 50%; margin-bottom: 8px; }
+.skeleton-change   { width: 30%; margin-bottom: 14px; }
+.skeleton-mini     { width: 90%; margin-bottom: 6px; }
+
+.stock-action .skeleton-btn {
+  flex: 1;
+  height: 30px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg) 25%,
+    color-mix(in srgb, var(--color-heading) 10%, var(--color-bg)) 50%,
+    var(--color-bg) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== Responsive ===== */
 
 @media (max-width: 1024px) {
   .stock-grid {
@@ -266,75 +622,97 @@
   .stock-grid {
     grid-template-columns: 1fr;
   }
+}
 
-  .gainers-losers-widget {
+@media (max-width: 480px) {
+  .market-tabs {
     flex-direction: column;
-    gap: 16px;
+  }
+
+  .market-tab {
+    width: 100%;
+    text-align: center;
+  }
+
+  .view-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
 
-/* ===== Skeleton loading state ===== */
-
-.skeleton-line {
-  background: linear-gradient(
-    90deg,
-    var(--color-bg) 25%,
-    #e5ddc8 50%,
-    var(--color-bg) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.4s infinite;
-  border-radius: 6px;
-  height: 12px;
+@media (prefers-reduced-motion: reduce) {
+  .stock-card .sc-chart svg,
+  .stock-card .sc-dot.live::after,
+  .stock-grid > a {
+    animation: none;
+    opacity: 1;
+  }
 }
 
-.skeleton-title {
-  height: 16px;
-  width: 60%;
-  margin-bottom: 8px;
+
+/* ===== STOCK ACTION BUTTONS ===== */
+
+.stock-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
 }
 
-.skeleton-subtitle {
-  width: 80%;
-  margin-bottom: 14px;
-}
+.stock-actions button {
+  height: 38px;
+  padding: 0 10px;
 
-.skeleton-price {
-  height: 18px;
-  width: 50%;
-  margin-bottom: 8px;
-}
-
-.skeleton-change {
-  width: 30%;
-  margin-bottom: 14px;
-}
-
-.skeleton-mini {
-  width: 90%;
-  margin-bottom: 6px;
-}
-
-.stock-action .skeleton-btn {
-  flex: 1;
-  height: 30px;
   border-radius: 8px;
-  background: linear-gradient(
-    90deg,
-    var(--color-bg) 25%,
-    #e5ddc8 50%,
-    var(--color-bg) 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.4s infinite;
+
+  font-family: 'Public Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease;
 }
 
-@keyframes skeleton-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
+.view-stock-btn {
+  border: 1px solid var(--navbar-border);
+  background: var(--color-bg);
+  color: var(--color-subheading);
+}
 
-  100% {
-    background-position: -200% 0;
-  }
+.view-stock-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.watchlist-btn {
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+}
+
+.watchlist-btn:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  transform: translateY(-1px);
+}
+
+.watchlist-btn.added {
+  background: color-mix(
+    in srgb,
+    var(--color-accent) 15%,
+    transparent
+  );
+  color: var(--color-accent);
+}
+
+.watchlist-btn.added:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
 }

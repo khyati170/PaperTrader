@@ -66,10 +66,7 @@ function App() {
   const handleLogin = (userData) => {
     setIsAuthenticated(true);
     setBalance(userData.balance ?? 50000);
-<<<<<<< ours
-=======
 
->>>>>>> theirs
     const formattedHoldings = {};
 
     if (userData.holdings && userData.holdings.length > 0) {

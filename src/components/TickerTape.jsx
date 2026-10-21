@@ -6,8 +6,9 @@ export default function TickerTape() {
   const [stocks, setStocks] = useState([]);
 
   useEffect(() => {
-    getStocks("us").then((r) => setStocks(r.stocks || []));
-  }, []);
+  getStocks().then((r) => setStocks(r.stocks || []))
+  .catch((error) => console.error("TICKER ERROR:", error));
+}, []);
 
   if (stocks.length === 0) return null;
 

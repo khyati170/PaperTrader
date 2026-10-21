@@ -4,6 +4,7 @@ import { getStocks } from "./data/stocks.js";
 import BuySellForm from "./components/BuySellForm.jsx";
 import "./stockDetail.css";
 
+
 function StockDetail({ balance, holdings, onBuy, onSell }) {
     const { symbol } = useParams();
     const navigate = useNavigate();
@@ -171,6 +172,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
                         <span>Low ${stock.lowprice}</span>
                         <span>High ${stock.highprice}</span>
                     </div>
+                    
                 </section>
             )}
 

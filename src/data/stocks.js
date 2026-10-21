@@ -51,18 +51,25 @@ const sectors = {
 let stocksPromise = null;
 const CACHE_DURATION_MS = 60 * 1000;
 
-export async function getStocks() {
-
+export async function getStocks(market = "us") {
   const savedStocks = sessionStorage.getItem("stocks");
   const savedTimestamp = sessionStorage.getItem("stocksTimestamp");
 
   if (savedStocks && savedTimestamp) {
-    const isExpired = Date.now()-Number(savedTimestamp) > CACHE_DURATION_MS;
+    const isExpired =
+      Date.now() - Number(savedTimestamp) > CACHE_DURATION_MS;
+
     const parsedStocks = JSON.parse(savedStocks);
 
     if (!isExpired && parsedStocks.length > 0) {
       console.log("Using cached stocks");
-      return parsedStocks;
+
+      return {
+        stocks: parsedStocks,
+        isStale: false,
+        fetchedAt: Number(savedTimestamp),
+        noData: false,
+      };
     }
   }
 
@@ -72,11 +79,9 @@ export async function getStocks() {
   }
 
   stocksPromise = (async () => {
-
     const stocks = [];
 
     for (const stockData of stocksData) {
-
       const response = await fetch(
         `https://finnhub.io/api/v1/quote?symbol=${stockData.symbol}&token=${API_KEY}`
       );
@@ -97,20 +102,45 @@ export async function getStocks() {
         highprice: data.h,
         lowprice: data.l,
         openprice: data.o,
-        previousclose: data.pc 
+        previousclose: data.pc,
       });
     }
 
+    const fetchedAt = Date.now();
+
     if (stocks.length === stocksData.length) {
       sessionStorage.setItem("stocks", JSON.stringify(stocks));
-      sessionStorage.setItem("stocksTimestamp", Date.now().toString());
+      sessionStorage.setItem("stocksTimestamp", fetchedAt.toString());
       console.log("Stocks saved to sessionStorage");
     } else {
       console.log("Some stocks failed, so cache was not saved");
     }
 
-    return stocks;
+    return {
+      stocks,
+      isStale: false,
+      fetchedAt,
+      noData: stocks.length === 0,
+    };
   })();
 
-  return stocksPromise;
+  try {
+    return await stocksPromise;
+  } finally {
+    stocksPromise = null;
+  }
+}
+
+ export async function refreshStocks(market = "us") {
+  try {
+    const stocks = market === "in" ? await fetchIndianStocks() : await fetchUSStocks();
+    const fetchedAt = writeCache(market, stocks);
+    return { stocks, isStale: false, fetchedAt, noData: false };
+  } catch (error) {
+    console.warn("Live refresh failed, keeping old data:", error.message);
+    return null;
+  }
+}
+export function simulateFetchFailure() {
+  sessionStorage.setItem("forceFetchFailure", "true");
 }
