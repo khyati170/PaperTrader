@@ -1,0 +1,37 @@
+.ticker-tape {
+  overflow: hidden;
+  margin-top: 14px;
+  border-top: 1px solid var(--navbar-border);
+  border-bottom: 1px solid var(--navbar-border);
+  background: var(--color-bg-alt);
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 60s linear infinite;
+}
+
+.ticker-tape:hover .ticker-track { animation-play-state: paused; }
+
+.ticker-item {
+  display: flex;
+  gap: 8px;
+  padding: 9px 22px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-subheading);
+  white-space: nowrap;
+}
+
+.ticker-item b { color: var(--color-heading); }
+.t-up { color: var(--color-gain); }
+.t-down { color: var(--color-loss); }
+
+@keyframes ticker-scroll {
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
