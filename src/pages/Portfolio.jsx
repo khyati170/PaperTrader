@@ -1,13 +1,29 @@
 import { useEffect, useState } from "react";
-import {Link} from "react-router-dom";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { Link } from "react-router-dom";
 import { getStocks } from "../data/stocks";
 import "./Portfolio.css";
 import MarketStatusBanner from "../components/MarketStatusBanner";
+import Modal from "../components/Modal";
+import { useToast } from "../context/ToastContext";
+import { isMarketOpen, getMarketStatusMessage } from "../config/marketConfig.js";
+
+const CHART_COLORS = [
+  "#2a9d8f", "#e07a5f", "#3d5a80", "#e9c46a",
+  "#8d6aa8", "#6a994e", "#d1495b", "#00798c",
+];
+
+const MAX_SLICES = 8;
 
 function Portfolio({ balance, holdings, onSell }) {
+  const { showToast } = useToast();
   const [stocks, setStocks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sellQty, setSellQty] = useState({});
+  const [groupBy, setGroupBy] = useState("stock");
+  const [pendingSell, setPendingSell] = useState(null); // { symbol, price, qty }
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     getStocks()
@@ -20,38 +36,107 @@ function Portfolio({ balance, holdings, onSell }) {
 
   const holdingSymbols = Object.keys(holdings);
 
-  // attach live current price to each holding
-  // const enrichedHoldings = holdingSymbols.map((symbol) => {
-  //   const { quantity, avgBuyPrice } = holdings[symbol];
-  //   const liveStock = stocks.find((s) => s.symbol === symbol);
-  //   const currentPrice = liveStock ? liveStock.price : avgBuyPrice;
+  // Har holding ke saath live current price jodo
   const enrichedHoldings = holdingSymbols
-  .map((symbol) => {
-    const quantity = Number(holdings[symbol]?.quantity) || 0;
-    const avgBuyPrice = Number(holdings[symbol]?.avgBuyPrice) || 0;
+    .map((symbol) => {
+      const quantity = Number(holdings[symbol]?.quantity) || 0;
+      const avgBuyPrice = Number(holdings[symbol]?.avgBuyPrice) || 0;
 
-    if (quantity <= 0) return null;
+      if (quantity <= 0) return null;
 
-    const liveStock = stocks.find((s) => s.symbol === symbol);
-    const currentPrice = liveStock ? Number(liveStock.price) || avgBuyPrice : avgBuyPrice;
-    const currentValue = currentPrice * quantity;
-    const investedValue = avgBuyPrice * quantity;
-    const gain = currentValue - investedValue;
-    const gainPercent = investedValue > 0 ? (gain / investedValue) * 100 : 0;
+      const liveStock = stocks.find((s) => s.symbol === symbol);
+      const currentPrice = liveStock ? Number(liveStock.price) || avgBuyPrice : avgBuyPrice;
+      const currentValue = currentPrice * quantity;
+      const investedValue = avgBuyPrice * quantity;
+      const gain = currentValue - investedValue;
+      const gainPercent = investedValue > 0 ? (gain / investedValue) * 100 : 0;
 
-    return { symbol, quantity, avgBuyPrice, currentPrice, currentValue, gain, gainPercent };
-  })
-  .filter(Boolean);
+      return { symbol, quantity, avgBuyPrice, currentPrice, currentValue, gain, gainPercent };
+    })
+    .filter(Boolean);
 
   const totalCurrentValue = enrichedHoldings.reduce((sum, h) => sum + h.currentValue, 0);
   const totalInvested = enrichedHoldings.reduce((sum, h) => sum + h.avgBuyPrice * h.quantity, 0);
   const totalProfit = totalCurrentValue - totalInvested;
 
-  function handleSellClick(symbol, currentPrice) {
-    const qty = Number(sellQty[symbol]) || 1;
-    if (qty <= 0) return;
-    onSell(symbol, currentPrice, qty);
-    setSellQty((prev) => ({ ...prev, [symbol]: "" }));
+  const groupedValues = {};
+  enrichedHoldings.forEach((h) => {
+    const key =
+      groupBy === "sector"
+        ? stocks.find((s) => s.symbol === h.symbol)?.sector || "Other"
+        : h.symbol;
+    groupedValues[key] = (groupedValues[key] || 0) + h.currentValue;
+  });
+
+  let allocationData = Object.entries(groupedValues)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  if (allocationData.length > MAX_SLICES) {
+    const top = allocationData.slice(0, MAX_SLICES - 1);
+    const otherValue = allocationData
+      .slice(MAX_SLICES - 1)
+      .reduce((sum, item) => sum + item.value, 0);
+    allocationData = [...top, { name: "Other", value: otherValue }];
+  }
+
+  allocationData = allocationData.map((item, i) => ({
+    ...item,
+    color: CHART_COLORS[i],
+    percent: totalCurrentValue > 0 ? (item.value / totalCurrentValue) * 100 : 0,
+  }));
+
+  // Sell dabane par: pehle checks, phir custom Modal khulta hai
+  function handleSellClick(symbol, currentPrice, owned) {
+    // 1. Market band ho toh modal se pehle hi rok do
+    if (!isMarketOpen()) {
+      showToast(getMarketStatusMessage(), "error");
+      return;
+    }
+
+    // 2. Quantity khali hai
+    const raw = sellQty[symbol];
+    if (raw === undefined || raw === "") {
+      showToast("Please enter the quantity you want to sell first.", "error");
+      return;
+    }
+
+    // 3. Whole number aur 0 se zyada
+    const qty = Number(raw);
+    if (!Number.isInteger(qty) || qty <= 0) {
+      showToast("Quantity must be a whole number greater than 0.", "error");
+      return;
+    }
+
+    // 4. Jitna own hai usse zyada nahi
+    if (qty > owned) {
+      showToast(`You own only ${owned} share(s) of ${symbol}.`, "error");
+      return;
+    }
+
+    // 5. Sab theek hai: custom Modal kholo
+    setPendingSell({ symbol, price: currentPrice, qty });
+  }
+
+  // Modal mein "Yes, sell" dabane par asli sell hota hai
+  function handleConfirmSell() {
+    if (!pendingSell) return;
+    const { symbol, price, qty } = pendingSell;
+
+    const ok = onSell(symbol, price, qty);
+
+    // Sell sach mein hua tabhi success dikhao
+    // (market band ya koi error ho toh App.jsx ka alert aayega, success nahi)
+    if (ok !== false) {
+      setSellQty((prev) => ({ ...prev, [symbol]: "" }));
+      setSuccessMessage(
+        `Sold ${qty} share(s) of ${symbol} for $${(qty * price).toFixed(2)}.`
+      );
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2500); // 2.5 sec baad box hat jaye
+    }
+
+    setPendingSell(null); // modal band
   }
 
   if (isLoading) {
@@ -60,8 +145,18 @@ function Portfolio({ balance, holdings, onSell }) {
 
   return (
     <div className="portfolio-page">
+      {showSuccess && (
+        <div className="success-overlay">
+          <div className="success-box">
+            <span className="success-icon">✅</span>
+            <h2>Success!</h2>
+            <p>{successMessage}</p>
+          </div>
+        </div>
+      )}
+
       <h1 className="page-title">Portfolio</h1>
-      <MarketStatusBanner/>
+      <MarketStatusBanner />
 
       <div className="portfolio-summary">
         <div className="summary-card">
@@ -79,6 +174,79 @@ function Portfolio({ balance, holdings, onSell }) {
           </p>
         </div>
       </div>
+
+      {enrichedHoldings.length > 0 && (
+        <div className="allocation-card">
+          <div className="allocation-header">
+            <h2 className="section-heading">Portfolio Allocation</h2>
+            <div className="allocation-toggle">
+              <button
+                className={groupBy === "stock" ? "toggle-btn active" : "toggle-btn"}
+                onClick={() => setGroupBy("stock")}
+              >
+                By Stock
+              </button>
+              <button
+                className={groupBy === "sector" ? "toggle-btn active" : "toggle-btn"}
+                onClick={() => setGroupBy("sector")}
+              >
+                By Sector
+              </button>
+            </div>
+          </div>
+
+          <div className="allocation-body">
+            <div className="allocation-chart">
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={allocationData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius={70}
+                    outerRadius={105}
+                    paddingAngle={2}
+                    stroke="var(--color-bg)"
+                    strokeWidth={2}
+                  >
+                    {allocationData.map((item) => (
+                      <Cell key={item.name} fill={item.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null;
+                      const d = payload[0].payload;
+                      return (
+                        <div className="allocation-tooltip">
+                          <strong>{d.name}</strong>
+                          <span>${d.value.toFixed(2)} · {d.percent.toFixed(1)}%</span>
+                        </div>
+                      );
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="allocation-center">
+                <span className="allocation-center-label">Total</span>
+                <span className="allocation-center-value">${totalCurrentValue.toFixed(0)}</span>
+              </div>
+            </div>
+
+            <ul className="allocation-legend">
+              {allocationData.map((item) => (
+                <li key={item.name}>
+                  <span className="legend-dot" style={{ background: item.color }} />
+                  <span className="legend-name">{item.name}</span>
+                  <span className="legend-percent">{item.percent.toFixed(1)}%</span>
+                  <span className="legend-value">${item.value.toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       <div className="portfolio-heading">
         <h2 className="section-heading">Your Stocks</h2>
         <Link to="/market" className="market-btn">
@@ -87,7 +255,9 @@ function Portfolio({ balance, holdings, onSell }) {
       </div>
 
       {enrichedHoldings.length === 0 ? (
-        <p className="empty-state">You don't own any stocks yet. Head to the Market to start trading.</p>
+        <p className="empty-state">
+          You don't own any stocks yet. Head to the Market to start trading.
+        </p>
       ) : (
         <div className="holdings-table-wrap">
           <table className="holdings-table">
@@ -128,7 +298,7 @@ function Portfolio({ balance, holdings, onSell }) {
                       />
                       <button
                         className="sell-btn"
-                        onClick={() => handleSellClick(h.symbol, h.currentPrice)}
+                        onClick={() => handleSellClick(h.symbol, h.currentPrice, h.quantity)}
                       >
                         Sell
                       </button>
@@ -140,6 +310,18 @@ function Portfolio({ balance, holdings, onSell }) {
           </table>
         </div>
       )}
+
+      <Modal
+        isOpen={pendingSell !== null}
+        title="Confirm sale"
+        confirmText="Yes, sell"
+        confirmClass="sell-button"
+        onConfirm={handleConfirmSell}
+        onCancel={() => setPendingSell(null)}
+      >
+        {pendingSell &&
+          `You are selling ${pendingSell.qty} share(s) of ${pendingSell.symbol}. You will receive $${(pendingSell.qty * pendingSell.price).toFixed(2)}.`}
+      </Modal>
     </div>
   );
 }

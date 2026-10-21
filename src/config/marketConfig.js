@@ -9,7 +9,7 @@ export function isMarketOpen() {
   if (!ENFORCE_MARKET_HOURS) return true;
 
   const now = new Date();
-  const day = now.getDay(); 
+  const day = now.getDay();
 
   if (day === 0 || day === 6) return false;
 

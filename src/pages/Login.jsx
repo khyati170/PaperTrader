@@ -1,333 +1,71 @@
-// import { useState } from "react";
-// import { useNavigate, useLocation } from "react-router-dom";
-// import { demoAccount } from "../data/demoAccount";
-// function Login({ onLogin }) {
-//     const [mode, setMode] = useState("login"); // "login" | "signup"
-//     const [showToast, setShowToast] = useState(false);
-//     const [toastName, setToastName] = useState("");
-
-//     // Signup fields
-//     const [name, setName] = useState("");
-//     const [age, setAge] = useState("");
-//     const [phone, setPhone] = useState("");
-//     const [signupEmail, setSignupEmail] = useState("");
-//     const [signupPassword, setSignupPassword] = useState("");
-
-//     // Login fields
-//     const [loginId, setLoginId] = useState(""); // email OR phone
-//     const [loginPassword, setLoginPassword] = useState("");
-
-//     const navigate = useNavigate();
-//     const location = useLocation();
-//     const redirectTo = location.state?.from?.pathname || "/market";
-
-//     const isValidEmail = (email) => {
-//         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//         return emailRegex.test(email);
-//     };
-    
-//     const getUsers = () => {
-//         const saved = localStorage.getItem("users");
-//         return saved ? JSON.parse(saved) : [];
-//     };
-
-//     const saveUsers = (users) => {
-//         localStorage.setItem("users", JSON.stringify(users));
-//     };
-
-//     const completeLogin = (user) => {
-//     setToastName(user.name);
-
-//     onLogin({
-//         name: user.name,
-//         email: user.email,
-//         balance: user.balance ?? 50000,
-//         holdings: user.holdings ?? [],
-//         isDemo: user.isDemo ?? false,
-//     });
-
-//     setShowToast(true);
-
-//     setTimeout(() => {
-//         navigate(redirectTo, { replace: true });
-//     }, 1800);
-// };
-
-    
-
-//     const handleSignup = (e) => {
-//         e.preventDefault();
-
-//         if (!name || !age || !phone || !signupEmail || !signupPassword) {
-//             alert("Please fill in all fields");
-//             return;
-//         }
-
-//         if (!isValidEmail(signupEmail)) {
-//             alert("Please enter a valid email address (e.g. name@gmail.com)");
-//             return;
-//         }
-
-//         if (Number(age) < 5 || Number(age) > 120) {
-//             alert("Please enter a valid age");
-//             return;
-//         }
-
-//         if (!/^\d{10}$/.test(phone)) {
-//             alert("Please enter a valid 10-digit phone number");
-//             return;
-//         }
-
-//         const hasDigit = /\d/.test(signupPassword);
-//         const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(signupPassword);
-
-//         if (signupPassword.length < 8) {
-//             alert("Password must be at least 8 characters long");
-//             return;
-//         }
-
-//         if (!hasDigit || !hasSpecialChar) {
-//             alert("Password must contain at least one digit and one special character (e.g. ! @ # $ %)");
-//             return;
-//         }
-
-//         const users = getUsers();
-
-//         const alreadyExists = users.some(
-//             (u) => u.email === signupEmail || u.phone === phone
-//         );
-
-//         if (alreadyExists) {
-//             alert("An account with this email or phone number already exists. Please log in instead.");
-//             setMode("login");
-//             return;
-//         }
-
-//         const newUser = { name, age, phone, email: signupEmail, password: signupPassword };
-//         saveUsers([...users, newUser]);
-
-//         completeLogin(newUser);
-//     };
-
-//     const handleLoginSubmit = (e) => {
-//         e.preventDefault();
-
-//         if (!loginId || !loginPassword) {
-//             alert("Please enter your email/phone and password");
-//             return;
-//         }
-
-//         const users = getUsers();
-//         const matchedUser = users.find(
-//             (u) =>
-//                 (u.email === loginId || u.phone === loginId) &&
-//                 u.password === loginPassword
-//         );
-
-//         if (!matchedUser) {
-//             alert("No account found with these details, or the password is incorrect.");
-//             return;
-//         }
-
-//         completeLogin(matchedUser);
-//     };
-
-//     const handleDemoLogin = () => {
-//     completeLogin(demoAccount);
-// };
-    
-
-
-//     return (
-//         <div className="auth-page">
-//             {showToast && (
-//                 <div className="login-toast">
-//                     <span className="login-toast-icon">🎉</span>
-//                     <div>
-//                         <p className="login-toast-title">Welcome, {toastName}!</p>
-//                         <p className="login-toast-text">
-//                             You've got a virtual wallet of <strong>$50,000</strong> to start trading.
-//                         </p>
-//                     </div>
-//                 </div>
-//             )}
-
-//             <div className="auth-card">
-//                 <div className="auth-tabs">
-//                     <button
-//                         className={`auth-tab ${mode === "login" ? "active" : ""}`}
-//                         onClick={() => setMode("login")}
-//                     >
-//                         Log In
-//                     </button>
-//                     <button
-//                         className={`auth-tab ${mode === "signup" ? "active" : ""}`}
-//                         onClick={() => setMode("signup")}
-//                     >
-//                         Sign Up
-//                     </button>
-//                 </div>
-
-//                 {mode === "login" ? (
-//                     <form className="auth-form" onSubmit={handleLoginSubmit}>
-//                         <h2>Welcome back</h2>
-//                         <p className="auth-subtext">Log in with your email or phone number</p>
-
-//                         <label htmlFor="login-id">Email or Phone Number</label>
-//                         <input
-//                             id="login-id"
-//                             type="text"
-//                             value={loginId}
-//                             onChange={(e) => setLoginId(e.target.value)}
-//                             placeholder="you@example.com or 9876543210"
-//                         />
-
-//                         <label htmlFor="login-password">Password</label>
-//                         <input
-//                             id="login-password"
-//                             type="password"
-//                             value={loginPassword}
-//                             onChange={(e) => setLoginPassword(e.target.value)}
-//                             placeholder="••••••••"
-//                         />
-
-//                         <button className="buy-button auth-submit" type="submit">
-//                             Log In
-//                         </button>
-//                         <div className="demo-divider">
-//                             <span>OR</span>
-//                         </div>
-
-//                         <button
-//                             className="demo-login-button"
-//                             type="button"
-//                             onClick={handleDemoLogin}
-//                         >
-//                             Try Demo Account
-//                         </button>
-
-//                         <p className="auth-switch-text">
-//                             New here?{" "}
-//                             <span onClick={() => setMode("signup")}>Create an account</span>
-//                         </p>
-//                     </form>
-//                 ) : (
-//                     <form className="auth-form" onSubmit={handleSignup}>
-//                         <h2>Create your account</h2>
-//                         <p className="auth-subtext">Start trading with a free $50,000 virtual wallet</p>
-
-//                         <label htmlFor="name">Full Name</label>
-//                         <input
-//                             id="name"
-//                             type="text"
-//                             value={name}
-//                             onChange={(e) => setName(e.target.value)}
-//                             placeholder="Your full name"
-//                         />
-
-//                         <div className="auth-row">
-//                             <div>
-//                                 <label htmlFor="age">Age</label>
-//                                 <input
-//                                     id="age"
-//                                     type="number"
-//                                     value={age}
-//                                     onChange={(e) => setAge(e.target.value)}
-//                                     placeholder="Age"
-//                                 />
-//                             </div>
-//                             <div>
-//                                 <label htmlFor="phone">Phone Number</label>
-//                                 <input
-//                                     id="phone"
-//                                     type="tel"
-//                                     value={phone}
-//                                     onChange={(e) => setPhone(e.target.value)}
-//                                     placeholder="10-digit number"
-//                                 />
-//                             </div>
-//                         </div>
-
-//                         <label htmlFor="signup-email">Email</label>
-//                         <input
-//                             id="signup-email"
-//                             type="email"
-//                             value={signupEmail}
-//                             onChange={(e) => setSignupEmail(e.target.value)}
-//                             placeholder="you@example.com"
-//                         />
-
-//                         <label htmlFor="signup-password">Password</label>
-//                         <input
-//                             id="signup-password"
-//                             type="password"
-//                             value={signupPassword}
-//                             onChange={(e) => setSignupPassword(e.target.value)}
-//                             placeholder="At least 8 chars, 1 digit, 1 special char"
-//                         />
-
-//                         <button className="buy-button auth-submit" type="submit">
-//                             Sign Up
-//                         </button>
-
-//                         <p className="auth-switch-text">
-//                             Already have an account?{" "}
-//                             <span onClick={() => setMode("login")}>Log in</span>
-//                         </p>
-//                     </form>
-//                 )}
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default Login;
-
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { demoAccount } from "../data/demoAccount";
+import { useToast } from "../context/ToastContext";
+import FormField from "../components/FormField";
+
+// ---------- Pure validation functions (component ke bahar) ----------
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+const validateSignup = (v) => {
+    const e = {};
+    if (v.name.trim().length < 2) e.name = "Enter your full name";
+
+    const age = Number(v.age);
+    if (!v.age) e.age = "Age is required";
+    else if (!Number.isInteger(age) || age < 5 || age > 120) e.age = "Enter a valid age (5-120)";
+
+    if (!/^\d{10}$/.test(v.phone)) e.phone = "Enter a 10-digit phone number";
+    if (!isValidEmail(v.email)) e.email = "Enter a valid email (e.g. name@gmail.com)";
+
+    if (v.password.length < 8) e.password = "Password must be at least 8 characters";
+    else if (!/\d/.test(v.password)) e.password = "Password needs at least one digit";
+    else if (!/[!@#$%^&*(),.?":{}|<>]/.test(v.password)) e.password = "Password needs one special character (! @ # $ %)";
+
+    if (v.confirmPassword !== v.password) e.confirmPassword = "Passwords do not match";
+    return e;
+};
+
+const validateLogin = (v) => {
+    const e = {};
+    if (!v.id.trim()) e.id = "Enter your email or phone number";
+    else if (v.id.includes("@") ? !isValidEmail(v.id) : !/^\d{10}$/.test(v.id))
+        e.id = "Enter a valid email or 10-digit phone number";
+    if (!v.password) e.password = "Enter your password";
+    return e;
+};
+
+const getUsers = () => JSON.parse(localStorage.getItem("users") || "[]");
+const saveUsers = (users) => localStorage.setItem("users", JSON.stringify(users));
+
+const emptySignup = { name: "", age: "", phone: "", email: "", password: "", confirmPassword: "" };
 
 function Login({ onLogin }) {
-    const [mode, setMode] = useState("login"); // "login" | "signup"
-    const [showToast, setShowToast] = useState(false);
-    const [toastName, setToastName] = useState("");
-    const [isDemoLogin, setIsDemoLogin] = useState(false);
-
-    // Signup fields
-    const [name, setName] = useState("");
-    const [age, setAge] = useState("");
-    const [phone, setPhone] = useState("");
-    const [signupEmail, setSignupEmail] = useState("");
-    const [signupPassword, setSignupPassword] = useState("");
-
-    // Login fields
-    const [loginId, setLoginId] = useState("");
-    const [loginPassword, setLoginPassword] = useState("");
+    const [mode, setMode] = useState("login");
+    const [signup, setSignup] = useState(emptySignup);
+    const [login, setLogin] = useState({ id: "", password: "" });
+    const [errors, setErrors] = useState({});
+    const [formError, setFormError] = useState("");
 
     const navigate = useNavigate();
     const location = useLocation();
-
+    const { showToast } = useToast();
     const redirectTo = location.state?.from?.pathname || "/market";
 
-    const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
+    // Ek hi function sabhi inputs ke liye: field ka naam leke state update karta hai
+    const updateSignup = (field) => (e) =>
+        setSignup((prev) => ({ ...prev, [field]: e.target.value }));
+    const updateLogin = (field) => (e) =>
+        setLogin((prev) => ({ ...prev, [field]: e.target.value }));
 
-    const getUsers = () => {
-        const saved = localStorage.getItem("users");
-        return saved ? JSON.parse(saved) : [];
-    };
-
-    const saveUsers = (users) => {
-        localStorage.setItem("users", JSON.stringify(users));
+    const switchMode = (newMode) => {
+        setMode(newMode);
+        setErrors({});
+        setFormError("");
     };
 
     const completeLogin = (user) => {
-        setToastName(user.name);
-        setIsDemoLogin(user.isDemo ?? false);
-
+        // Auth slice aane ke baad yahan dispatch(login(...)) lagega (teammate B ke saath decide karo)
         onLogin({
             name: user.name,
             email: user.email,
@@ -336,311 +74,131 @@ function Login({ onLogin }) {
             isDemo: user.isDemo ?? false,
         });
 
-        setShowToast(true);
-
-        setTimeout(() => {
-            navigate(redirectTo, { replace: true });
-        }, 1800);
-    };
-
-    const handleDemoLogin = () => {
-        completeLogin(demoAccount);
+        showToast(
+            user.isDemo
+                ? `Welcome, ${user.name}! Your demo portfolio is ready.`
+                : `Welcome, ${user.name}! You've got a $50,000 virtual wallet.`,
+            "success"
+        );
+        navigate(redirectTo, { replace: true });
     };
 
     const handleSignup = (e) => {
         e.preventDefault();
-
-        if (!name || !age || !phone || !signupEmail || !signupPassword) {
-            alert("Please fill in all fields");
-            return;
-        }
-
-        if (!isValidEmail(signupEmail)) {
-            alert("Please enter a valid email address (e.g. name@gmail.com)");
-            return;
-        }
-
-        if (Number(age) < 5 || Number(age) > 120) {
-            alert("Please enter a valid age");
-            return;
-        }
-
-        if (!/^\d{10}$/.test(phone)) {
-            alert("Please enter a valid 10-digit phone number");
-            return;
-        }
-
-        const hasDigit = /\d/.test(signupPassword);
-        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(signupPassword);
-
-        if (signupPassword.length < 8) {
-            alert("Password must be at least 8 characters long");
-            return;
-        }
-
-        if (!hasDigit || !hasSpecialChar) {
-            alert(
-                "Password must contain at least one digit and one special character (e.g. ! @ # $ %)"
-            );
-            return;
-        }
+        const found = validateSignup(signup);
+        setErrors(found);
+        if (Object.keys(found).length > 0) return;
 
         const users = getUsers();
-
-        const alreadyExists = users.some(
-            (u) => u.email === signupEmail || u.phone === phone
-        );
-
-        if (alreadyExists) {
-            alert(
-                "An account with this email or phone number already exists. Please log in instead."
-            );
-            setMode("login");
+        const exists = users.some((u) => u.email === signup.email || u.phone === signup.phone);
+        if (exists) {
+            showToast("An account with this email or phone already exists. Please log in.", "error");
+            switchMode("login");
             return;
         }
 
         const newUser = {
-            name,
-            age,
-            phone,
-            email: signupEmail,
-            password: signupPassword,
+            name: signup.name.trim(), age: signup.age, phone: signup.phone,
+            email: signup.email, password: signup.password,
         };
-
         saveUsers([...users, newUser]);
         completeLogin(newUser);
     };
 
     const handleLoginSubmit = (e) => {
         e.preventDefault();
+        const found = validateLogin(login);
+        setErrors(found);
+        setFormError("");
+        if (Object.keys(found).length > 0) return;
 
-        if (!loginId || !loginPassword) {
-            alert("Please enter your email/phone and password");
-            return;
-        }
-
-        const users = getUsers();
-
-        const matchedUser = users.find(
-            (u) =>
-                (u.email === loginId || u.phone === loginId) &&
-                u.password === loginPassword
+        const matched = getUsers().find(
+            (u) => (u.email === login.id || u.phone === login.id) && u.password === login.password
         );
-
-        if (!matchedUser) {
-            alert(
-                "No account found with these details, or the password is incorrect."
-            );
+        if (!matched) {
+            setFormError("No account found with these details, or the password is incorrect.");
             return;
         }
-
-        completeLogin(matchedUser);
+        completeLogin(matched);
     };
 
     return (
         <div className="auth-page">
-            {showToast && (
-                <div className="login-toast">
-                    <span className="login-toast-icon">🎉</span>
-
-                    <div>
-                        <p className="login-toast-title">
-                            Welcome, {toastName}!
-                        </p>
-
-                        <p className="login-toast-text">
-                            {isDemoLogin ? (
-                                "Your demo portfolio is ready with pre-loaded holdings."
-                            ) : (
-                                <>
-                                    You've got a virtual wallet of{" "}
-                                    <strong>$50,000</strong> to start trading.
-                                </>
-                            )}
-                        </p>
-                    </div>
-                </div>
-            )}
-
             <div className="auth-card">
                 <div className="auth-tabs">
-                    <button
-                        className={`auth-tab ${
-                            mode === "login" ? "active" : ""
-                        }`}
-                        onClick={() => setMode("login")}
-                    >
+                    <button className={`auth-tab ${mode === "login" ? "active" : ""}`} onClick={() => switchMode("login")}>
                         Log In
                     </button>
-
-                    <button
-                        className={`auth-tab ${
-                            mode === "signup" ? "active" : ""
-                        }`}
-                        onClick={() => setMode("signup")}
-                    >
+                    <button className={`auth-tab ${mode === "signup" ? "active" : ""}`} onClick={() => switchMode("signup")}>
                         Sign Up
                     </button>
                 </div>
 
                 {mode === "login" ? (
-                    <form
-                        className="auth-form"
-                        onSubmit={handleLoginSubmit}
-                    >
+                    <form className="auth-form" onSubmit={handleLoginSubmit} noValidate>
                         <h2>Welcome back</h2>
+                        <p className="auth-subtext">Log in with your email or phone number</p>
 
-                        <p className="auth-subtext">
-                            Log in with your email or phone number
-                        </p>
+                        {formError && <p className="form-error">{formError}</p>}
 
-                        <label htmlFor="login-id">
-                            Email or Phone Number
-                        </label>
+                        <FormField id="login-id" label="Email or Phone Number"
+                            value={login.id} onChange={updateLogin("id")}
+                            placeholder="you@example.com or 9876543210" error={errors.id} />
 
-                        <input
-                            id="login-id"
-                            type="text"
-                            value={loginId}
-                            onChange={(e) => setLoginId(e.target.value)}
-                            placeholder="you@example.com or 9876543210"
-                        />
+                        <FormField id="login-password" label="Password" type="password"
+                            value={login.password} onChange={updateLogin("password")}
+                            placeholder="••••••••" error={errors.password} />
 
-                        <label htmlFor="login-password">
-                            Password
-                        </label>
+                        <button className="buy-button auth-submit" type="submit">Log In</button>
 
-                        <input
-                            id="login-password"
-                            type="password"
-                            value={loginPassword}
-                            onChange={(e) =>
-                                setLoginPassword(e.target.value)
-                            }
-                            placeholder="••••••••"
-                        />
+                        <div className="demo-divider"><span>OR</span></div>
 
-                        <button
-                            className="buy-button auth-submit"
-                            type="submit"
-                        >
-                            Log In
-                        </button>
-
-                        <div className="demo-divider">
-                            <span>OR</span>
-                        </div>
-
-                        <button
-                            className="demo-login-button"
-                            type="button"
-                            onClick={handleDemoLogin}
-                        >
+                        <button className="demo-login-button" type="button" onClick={() => completeLogin(demoAccount)}>
                             Try Demo Account
                         </button>
 
                         <p className="auth-switch-text">
-                            New here?{" "}
-                            <span onClick={() => setMode("signup")}>
-                                Create an account
-                            </span>
+                            New here? <span onClick={() => switchMode("signup")}>Create an account</span>
                         </p>
                     </form>
                 ) : (
-                    <form
-                        className="auth-form"
-                        onSubmit={handleSignup}
-                    >
+                    <form className="auth-form" onSubmit={handleSignup} noValidate>
                         <h2>Create your account</h2>
+                        <p className="auth-subtext">Start trading with a free $50,000 virtual wallet</p>
 
-                        <p className="auth-subtext">
-                            Start trading with a free $50,000 virtual wallet
-                        </p>
-
-                        <label htmlFor="name">
-                            Full Name
-                        </label>
-
-                        <input
-                            id="name"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Your full name"
-                        />
+                        <FormField id="name" label="Full Name"
+                            value={signup.name} onChange={updateSignup("name")}
+                            placeholder="Your full name" error={errors.name} />
 
                         <div className="auth-row">
                             <div>
-                                <label htmlFor="age">Age</label>
-
-                                <input
-                                    id="age"
-                                    type="number"
-                                    value={age}
-                                    onChange={(e) =>
-                                        setAge(e.target.value)
-                                    }
-                                    placeholder="Age"
-                                />
+                                <FormField id="age" label="Age" type="number"
+                                    value={signup.age} onChange={updateSignup("age")}
+                                    placeholder="Age" error={errors.age} />
                             </div>
-
                             <div>
-                                <label htmlFor="phone">
-                                    Phone Number
-                                </label>
-
-                                <input
-                                    id="phone"
-                                    type="tel"
-                                    value={phone}
-                                    onChange={(e) =>
-                                        setPhone(e.target.value)
-                                    }
-                                    placeholder="10-digit number"
-                                />
+                                <FormField id="phone" label="Phone Number" type="tel"
+                                    value={signup.phone} onChange={updateSignup("phone")}
+                                    placeholder="10-digit number" error={errors.phone} />
                             </div>
                         </div>
 
-                        <label htmlFor="signup-email">
-                            Email
-                        </label>
+                        <FormField id="signup-email" label="Email" type="email"
+                            value={signup.email} onChange={updateSignup("email")}
+                            placeholder="you@example.com" error={errors.email} />
 
-                        <input
-                            id="signup-email"
-                            type="email"
-                            value={signupEmail}
-                            onChange={(e) =>
-                                setSignupEmail(e.target.value)
-                            }
-                            placeholder="you@example.com"
-                        />
+                        <FormField id="signup-password" label="Password" type="password"
+                            value={signup.password} onChange={updateSignup("password")}
+                            placeholder="At least 8 chars, 1 digit, 1 special char" error={errors.password} />
 
-                        <label htmlFor="signup-password">
-                            Password
-                        </label>
+                        <FormField id="confirm-password" label="Confirm Password" type="password"
+                            value={signup.confirmPassword} onChange={updateSignup("confirmPassword")}
+                            placeholder="Re-enter your password" error={errors.confirmPassword} />
 
-                        <input
-                            id="signup-password"
-                            type="password"
-                            value={signupPassword}
-                            onChange={(e) =>
-                                setSignupPassword(e.target.value)
-                            }
-                            placeholder="At least 8 chars, 1 digit, 1 special char"
-                        />
-
-                        <button
-                            className="buy-button auth-submit"
-                            type="submit"
-                        >
-                            Sign Up
-                        </button>
+                        <button className="buy-button auth-submit" type="submit">Sign Up</button>
 
                         <p className="auth-switch-text">
-                            Already have an account?{" "}
-                            <span onClick={() => setMode("login")}>
-                                Log in
-                            </span>
+                            Already have an account? <span onClick={() => switchMode("login")}>Log in</span>
                         </p>
                     </form>
                 )}
@@ -650,5 +208,3 @@ function Login({ onLogin }) {
 }
 
 export default Login;
-
-

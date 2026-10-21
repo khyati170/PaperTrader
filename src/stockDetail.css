@@ -272,12 +272,12 @@ tr:last-child td {
     margin-bottom: 12px;
 }
 
-.gainers-losers > div {
+.gainers-losers>div {
     flex: 1;
     min-width: 0;
 }
 
-.gainers-losers > div > div {
+.gainers-losers>div>div {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
@@ -459,7 +459,7 @@ tr:last-child td {
     gap: 12px;
 }
 
-.auth-row > div {
+.auth-row>div {
     flex: 1;
 }
 
@@ -629,6 +629,7 @@ body.dark .demo-login-button {
 
 
 @media (max-width: 480px) {
+
     .auth-page::before,
     .auth-page::after {
         width: 250px;
@@ -692,8 +693,191 @@ body.dark .demo-login-button {
         opacity: 0;
         transform: scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: scale(1);
     }
+}
+
+/* ---------- Toast ---------- */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 2000;
+}
+
+.toast {
+    min-width: 240px;
+    max-width: 340px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: var(--color-bg-alt);
+    color: var(--color-heading);
+    border-left: 4px solid var(--color-accent);
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    animation: toastIn 0.25s ease;
+}
+
+.toast-success {
+    border-left-color: var(--color-gain);
+}
+
+.toast-error {
+    border-left-color: var(--color-loss);
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1500;
+    padding: 20px;
+}
+
+.modal-box {
+    background: var(--color-bg-alt);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 380px;
+    animation: popIn 0.2s ease;
+}
+
+.modal-box h3 {
+    margin: 0 0 12px;
+    color: var(--color-heading);
+}
+
+.modal-body {
+    color: var(--color-subheading);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-actions button {
+    flex: 1;
+    width: auto;
+}
+
+.modal-cancel {
+    padding: 11px 22px;
+    border-radius: 40px;
+    cursor: pointer;
+    border: 1px solid var(--color-eyebrow);
+    background: transparent;
+    color: var(--color-subheading);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ---------- Inline validation errors (BuySell + Login) ---------- */
+.field-error,
+.trade-panel .field-error,
+.auth-form .field-error {
+    color: var(--color-loss);
+    font-size: 12px;
+    margin: -8px 0 12px;
+}
+
+input.input-error,
+.trade-panel input.input-error,
+.auth-form input.input-error {
+    box-shadow: 0 0 0 2px var(--color-loss);
+}
+
+.form-error {
+    color: var(--color-loss);
+    font-size: 13px;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--color-loss) 15%, transparent);
+}
+
+//css of tabs in stock detail page
+.detail-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.detail-tab {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 40px;
+    cursor: pointer;
+    background: var(--color-bg-alt);
+    color: var(--color-eyebrow);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.detail-tab.active {
+    background: var(--color-accent);
+    color: var(--color-bg);
+}
+
+.range-title {
+    margin: 22px 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-subheading);
+}
+
+.range-bar {
+    position: relative;
+    height: 8px;
+    border-radius: 8px;
+    margin: 14px 0 8px;
+    background: linear-gradient(to right, var(--color-loss), var(--color-gain));
+}
+
+.range-marker {
+    position: absolute;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-heading);
+    border: 3px solid var(--color-bg-alt);
+    transform: translate(-50%, -50%);
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--color-eyebrow);
 }
