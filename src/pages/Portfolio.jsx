@@ -15,7 +15,7 @@ const CHART_COLORS = [
 
 const MAX_SLICES = 8;
 
-function Portfolio({ balance, holdings, onSell }) {
+function Portfolio({ balance, holdings, transactions = [], onSell }) {
   const { showToast } = useToast();
   const [stocks, setStocks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,18 +25,34 @@ function Portfolio({ balance, holdings, onSell }) {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  // Load live prices
   useEffect(() => {
-  getStocks()
-    .then((data) => {
-      setStocks(data.stocks);
-      setIsLoading(false);
-    })
-    .catch(() => setIsLoading(false));
-}, []);
+    let isMounted = true;
+
+    getStocks()
+      .then((result) => {
+        if (!isMounted) return;
+        setStocks(result?.stocks || []);
+        setIsLoading(false);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setIsLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, []);
+
+  // Hide the success box after 2.5s (timer is cleaned up if the page closes)
+  useEffect(() => {
+    if (!showSuccess) return;
+    const id = setTimeout(() => setShowSuccess(false), 2500);
+    return () => clearTimeout(id);
+  }, [showSuccess]);
 
   const holdingSymbols = Object.keys(holdings);
 
-  // Har holding ke saath live current price jodo
+  // Attach the live current price to each holding
   const enrichedHoldings = holdingSymbols
     .map((symbol) => {
       const quantity = Number(holdings[symbol]?.quantity) || 0;
@@ -86,57 +102,56 @@ function Portfolio({ balance, holdings, onSell }) {
     percent: totalCurrentValue > 0 ? (item.value / totalCurrentValue) * 100 : 0,
   }));
 
-  // Sell dabane par: pehle checks, phir custom Modal khulta hai
+  // On Sell click: run the checks first, then open the confirm Modal
   function handleSellClick(symbol, currentPrice, owned) {
-    // 1. Market band ho toh modal se pehle hi rok do
+    // 1. Market closed: stop before the modal
     if (!isMarketOpen()) {
       showToast(getMarketStatusMessage(), "error");
       return;
     }
 
-    // 2. Quantity khali hai
+    // 2. Quantity is empty
     const raw = sellQty[symbol];
     if (raw === undefined || raw === "") {
       showToast("Please enter the quantity you want to sell first.", "error");
       return;
     }
 
-    // 3. Whole number aur 0 se zyada
+    // 3. Must be a whole number greater than 0
     const qty = Number(raw);
     if (!Number.isInteger(qty) || qty <= 0) {
       showToast("Quantity must be a whole number greater than 0.", "error");
       return;
     }
 
-    // 4. Jitna own hai usse zyada nahi
+    // 4. Cannot sell more than owned
     if (qty > owned) {
       showToast(`You own only ${owned} share(s) of ${symbol}.`, "error");
       return;
     }
 
-    // 5. Sab theek hai: custom Modal kholo
+    // 5. All good: open the confirm Modal
     setPendingSell({ symbol, price: currentPrice, qty });
   }
 
-  // Modal mein "Yes, sell" dabane par asli sell hota hai
+  // "Yes, sell" in the Modal performs the actual sale
   function handleConfirmSell() {
     if (!pendingSell) return;
     const { symbol, price, qty } = pendingSell;
 
     const ok = onSell(symbol, price, qty);
 
-    // Sell sach mein hua tabhi success dikhao
-    // (market band ya koi error ho toh App.jsx ka alert aayega, success nahi)
+    // Show success only if the sale really happened
+    // (if the market is closed or something fails, App.jsx shows an alert instead)
     if (ok !== false) {
       setSellQty((prev) => ({ ...prev, [symbol]: "" }));
       setSuccessMessage(
         `Sold ${qty} share(s) of ${symbol} for $${(qty * price).toFixed(2)}.`
       );
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2500); // 2.5 sec baad box hat jaye
     }
 
-    setPendingSell(null); // modal band
+    setPendingSell(null); // close modal
   }
 
   if (isLoading) {
@@ -304,6 +319,42 @@ function Portfolio({ balance, holdings, onSell }) {
                       </button>
                     </div>
                   </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ---------- Transaction History ---------- */}
+      <div className="portfolio-heading">
+        <h2 className="section-heading">Transaction History</h2>
+      </div>
+
+      {transactions.length === 0 ? (
+        <p className="empty-state">No transactions yet.</p>
+      ) : (
+        <div className="holdings-table-wrap">
+          <table className="holdings-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Symbol</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((t) => (
+                <tr key={t.id}>
+                  <td>{new Date(t.date).toLocaleString()}</td>
+                  <td className={t.type === "BUY" ? "gain" : "loss"}>{t.type}</td>
+                  <td className="symbol-cell">{t.symbol}</td>
+                  <td>{t.quantity}</td>
+                  <td>${Number(t.price).toFixed(2)}</td>
+                  <td>${Number(t.total).toFixed(2)}</td>
                 </tr>
               ))}
             </tbody>

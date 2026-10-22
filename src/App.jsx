@@ -1,10 +1,13 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { useState, useEffect } from "react";
 
-import {
-  isMarketOpen,
-  getMarketStatusMessage,
-} from "./config/marketConfig.js";
+import { isMarketOpen, getMarketStatusMessage } from "./config/marketConfig.js";
 
 import Navbar from "./components/navbar";
 import Home from "./pages/Home";
@@ -16,55 +19,100 @@ import Portfolio from "./pages/Portfolio.jsx";
 import Lessons from "./pages/lessons.jsx";
 import TickerTape from "./components/TickerTape";
 
-function App() {
-  const [watchlist, setWatchlist] = useState(() => {
-    const saved = localStorage.getItem("watchlist");
-    return saved ? JSON.parse(saved) : [];
-  });
+// ---------- Persistence helpers ----------
+const SESSION_KEY = "paperTrader:session";
+const dataKey = (email) => `paperTrader:data:${email}`;
+const EMPTY_DATA = { balance: 0, holdings: {}, transactions: [], watchlist: [] };
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const makeId = () =>
+  `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-  const [balance, setBalance] = useState(() => {
-    const saved = localStorage.getItem("balance");
-    return saved ? Number(saved) : 0;
-  });
+function readUserData(email) {
+  try {
+    const raw = localStorage.getItem(dataKey(email));
+    return raw ? { ...EMPTY_DATA, ...JSON.parse(raw) } : null;
+  } catch {
+    return null;
+  }
+}
 
-  const [holdings, setHoldings] = useState(() => {
-    const saved = localStorage.getItem("holdings");
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  useEffect(() => {
-    localStorage.setItem("watchlist", JSON.stringify(watchlist));
-  }, [watchlist]);
-
-  useEffect(() => {
-    localStorage.setItem("balance", balance);
-  }, [balance]);
-
-  useEffect(() => {
-    localStorage.setItem("holdings", JSON.stringify(holdings));
-  }, [holdings]);
-
- const toggleWatchlist = (symbol) => {
-  setWatchlist((prev) => {
-    if (prev.includes(symbol)) {
-      return prev.filter((s) => s !== symbol);
+// Runs once on page load: restores the logged-in user and their saved data
+function loadInitial() {
+  try {
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY));
+    if (session?.email) {
+      const data = readUserData(session.email);
+      if (data) return { user: session, data };
     }
+  } catch {
+    // ignore corrupted storage
+  }
+  return { user: null, data: EMPTY_DATA };
+}
 
-    return [...prev, symbol];
-  });
-};
+// Sends logged-out visitors to /login, then back to the page they wanted
+function RequireAuth({ isAuthenticated, children }) {
+  const location = useLocation();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
+function App() {
+  const [initial] = useState(loadInitial);
+  const [user, setUser] = useState(initial.user);
+  const [balance, setBalance] = useState(initial.data.balance);
+  const [holdings, setHoldings] = useState(initial.data.holdings);
+  const [transactions, setTransactions] = useState(initial.data.transactions);
+  const [watchlist, setWatchlist] = useState(initial.data.watchlist);
+
+  const isAuthenticated = user !== null;
+
+  // Save this user's data whenever anything changes (only while logged in)
+  useEffect(() => {
+    if (!user) return;
+    localStorage.setItem(
+      dataKey(user.email),
+      JSON.stringify({ balance, holdings, transactions, watchlist })
+    );
+  }, [user, balance, holdings, transactions, watchlist]);
+
+  const toggleWatchlist = (symbol) => {
+    setWatchlist((prev) =>
+      prev.includes(symbol)
+        ? prev.filter((s) => s !== symbol)
+        : [...prev, symbol]
+    );
+  };
+
+  const addTransaction = (type, symbol, price, quantity) => {
+    setTransactions((prev) => [
+      {
+        id: makeId(),
+        type, // "BUY" or "SELL"
+        symbol,
+        quantity,
+        price,
+        total: price * quantity,
+        date: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  };
 
   // LOGIN
   const handleLogin = (userData) => {
-    setIsAuthenticated(true);
-    setBalance(userData.balance ?? 50000);
+    const saved = readUserData(userData.email);
+    let data;
 
-    const formattedHoldings = {};
-
-    if (userData.holdings && userData.holdings.length > 0) {
-      userData.holdings.forEach((stock) => {
+    if (saved) {
+      // Returning user: load exactly what they had
+      data = saved;
+    } else {
+      // First login ever for this account: seed from signup / demo data
+      const formattedHoldings = {};
+      (userData.holdings || []).forEach((stock) => {
         formattedHoldings[stock.symbol] = {
           quantity: stock.quantity,
           avgBuyPrice: stock.buyPrice,
@@ -72,22 +120,49 @@ function App() {
           name: stock.name,
         };
       });
+
+      const seededTransactions = (userData.holdings || []).map((stock) => ({
+        id: makeId(),
+        type: "BUY",
+        symbol: stock.symbol,
+        quantity: stock.quantity,
+        price: stock.buyPrice,
+        total: stock.buyPrice * stock.quantity,
+        date: stock.buyDate,
+      }));
+
+      data = {
+        balance: userData.balance ?? 50000,
+        holdings: formattedHoldings,
+        transactions: seededTransactions,
+        watchlist: [],
+      };
     }
 
-    setHoldings(formattedHoldings);
+    const sessionUser = {
+      name: userData.name,
+      email: userData.email,
+      isDemo: !!userData.isDemo,
+    };
 
-    // Store which type of account is currently logged in
-    localStorage.setItem(
-      "accountType",
-      userData.isDemo ? "demo" : "normal"
-    );
+    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+    localStorage.setItem("accountType", userData.isDemo ? "demo" : "normal");
+
+    setBalance(data.balance);
+    setHoldings(data.holdings);
+    setTransactions(data.transactions);
+    setWatchlist(data.watchlist);
+    setUser(sessionUser);
   };
 
+  // LOGOUT: clears the screen state only. The saved data stays in localStorage.
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    setUser(null);
     setBalance(0);
     setHoldings({});
+    setTransactions([]);
     setWatchlist([]);
+    localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem("accountType");
   };
 
@@ -128,14 +203,9 @@ function App() {
 
       const existingQty = Number(existing.quantity) || 0;
       const existingAvgPrice = Number(existing.avgBuyPrice) || 0;
-
-      const totalCost =
-        existingAvgPrice * existingQty + price * quantity;
-
+      const totalCost = existingAvgPrice * existingQty + price * quantity;
       const totalQuantity = existingQty + quantity;
-
-      const newAvgBuyPrice =
-        totalQuantity > 0 ? totalCost / totalQuantity : 0;
+      const newAvgBuyPrice = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
       return {
         ...prev,
@@ -146,6 +216,8 @@ function App() {
         },
       };
     });
+
+    addTransaction("BUY", symbol, price, quantity);
     return true;
   };
 
@@ -189,6 +261,8 @@ function App() {
         },
       };
     });
+
+    addTransaction("SELL", symbol, price, quantity);
     return true;
   };
 
@@ -199,7 +273,7 @@ function App() {
         balance={balance}
         onLogout={handleLogout}
       />
-    <TickerTape/>
+      <TickerTape />
 
       <Routes>
         <Route
@@ -225,42 +299,35 @@ function App() {
         <Route
           path="/stock/:symbol"
           element={
-            <StockDetail
-              balance={balance}
-              holdings={holdings}
-              onBuy={handleBuy}
-              onSell={handleSell}
-            />
+            <RequireAuth isAuthenticated={isAuthenticated}>
+              <StockDetail
+                balance={balance}
+                holdings={holdings}
+                onBuy={handleBuy}
+                onSell={handleSell}
+              />
+            </RequireAuth>
           }
         />
 
-        <Route
-          path="/login"
-          element={<Login onLogin={handleLogin} />}
-        />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
 
         <Route
           path="/portfolio"
           element={
-            <Portfolio
-              balance={balance}
-              holdings={holdings}
-              onSell={handleSell}
-            />
+            <RequireAuth isAuthenticated={isAuthenticated}>
+              <Portfolio
+                balance={balance}
+                holdings={holdings}
+                transactions={transactions}
+                onSell={handleSell}
+              />
+            </RequireAuth>
           }
         />
-        <Route
-          path="/"
-          element={
-            <Home
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/lessons"
-          element={<Lessons />}/>
-     
+
+        <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
+        <Route path="/lessons" element={<Lessons />} />
       </Routes>
     </BrowserRouter>
   );
