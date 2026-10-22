@@ -1,22 +1,32 @@
-import {features} from "../data/features";
+import { features } from "../data/features";
 
-function FeatureSection({ variant,title,text,icon}) {
+function FeatureSection() {
   return (
     <section className="features-section">
-      <h2 className="section-heading">What You Can Do</h2>
-      <p className="section-subheading">Everything you need to learn the market, risk-free.</p>
-      <div className="features-grid">
-        {features.map((feature) => (
-          <div className="feature-card" key={feature.id}>
-            <div className="feature-icon-wrap">{feature.icon}</div>
-            <h3>{feature.title}</h3>
-            <p>{feature.text}</p>
-          </div>
-        ))}
+      <div className="features-inner">
+        <p className="features-eyebrow">Features</p>
+        <h2 className="features-title">
+          Everything you need to learn the market, risk-free
+        </h2>
+
+        <div className="bento-grid">
+          {features.map((feature) => (
+            <article
+              className={`bento-card bento-card-${feature.id}`}
+              key={feature.id}
+            >
+              <div className="bento-icon">{feature.icon}</div>
+              <div className="bento-body">
+                <p className="bento-eyebrow">{feature.eyebrow}</p>
+                <h3>{feature.title}</h3>
+                <p className="bento-text">{feature.text}</p>
+              </div>
+            </article>
+          ))}
         </div>
+      </div>
     </section>
-   
-  );  
+  );
 }
 
 export default FeatureSection;
