@@ -191,6 +191,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
                 onBuy={handleBuy}
                 onSell={handleSell}
             />
+       
         </main>
     );
 }
