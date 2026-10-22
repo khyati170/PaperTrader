@@ -26,13 +26,13 @@ function Portfolio({ balance, holdings, onSell }) {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
-    getStocks()
-      .then((data) => {
-        setStocks(data);
-        setIsLoading(false);
-      })
-      .catch(() => setIsLoading(false));
-  }, []);
+  getStocks()
+    .then((data) => {
+      setStocks(data.stocks);
+      setIsLoading(false);
+    })
+    .catch(() => setIsLoading(false));
+}, []);
 
   const holdingSymbols = Object.keys(holdings);
 
