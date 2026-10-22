@@ -79,6 +79,10 @@ function App() {
   }, [user, balance, holdings, transactions, watchlist]);
 
   const toggleWatchlist = (symbol) => {
+    if (!isAuthenticated) {
+      alert("Please login or use Demo Account to use the watchlist.");
+      return;
+    }
     setWatchlist((prev) =>
       prev.includes(symbol)
         ? prev.filter((s) => s !== symbol)
@@ -168,6 +172,10 @@ function App() {
 
   // BUY
   const handleBuy = (symbol, price, quantity) => {
+    if (!isAuthenticated) {
+      alert("Please login or use Demo Account to buy stocks.");
+      return false;
+    }
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
       return false;
@@ -223,6 +231,10 @@ function App() {
 
   // SELL
   const handleSell = (symbol, price, quantity) => {
+    if (!isAuthenticated) {
+      alert("Please login or use Demo Account to sell stocks.");
+      return false;
+    }
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
       return false;
@@ -289,10 +301,14 @@ function App() {
         <Route
           path="/watchlist"
           element={
-            <WatchList
-              watchlist={watchlist}
-              toggleWatchlist={toggleWatchlist}
-            />
+            isAuthenticated ? (
+              <WatchList
+                watchlist={watchlist}
+                toggleWatchlist={toggleWatchlist}
+              />
+            ) : (
+              <Login onLogin={handleLogin} />
+            )
           }
         />
 
