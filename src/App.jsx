@@ -17,36 +17,20 @@ import Lessons from "./pages/lessons.jsx";
 import TickerTape from "./components/TickerTape";
 
 function App() {
-  const [watchlist, setWatchlist] = useState(() => {
-    const saved = localStorage.getItem("watchlist");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [watchlist, setWatchlist] = useState([]);
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const [balance, setBalance] = useState(() => {
-    const saved = localStorage.getItem("balance");
-    return saved ? Number(saved) : 0;
-  });
-
-  const [holdings, setHoldings] = useState(() => {
-    const saved = localStorage.getItem("holdings");
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  useEffect(() => {
-    localStorage.setItem("watchlist", JSON.stringify(watchlist));
-  }, [watchlist]);
-
-  useEffect(() => {
-    localStorage.setItem("balance", balance);
-  }, [balance]);
-
-  useEffect(() => {
-    localStorage.setItem("holdings", JSON.stringify(holdings));
-  }, [holdings]);
+  const [balance, setBalance] = useState(0);
+  
+  const [holdings, setHoldings] = useState({});
 
  const toggleWatchlist = (symbol) => {
+  if (!isAuthenticated) {
+    alert("Please login or use Demo Account to use the watchlist.");
+    return;
+  }
+
   setWatchlist((prev) => {
     if (prev.includes(symbol)) {
       return prev.filter((s) => s !== symbol);
@@ -56,43 +40,47 @@ function App() {
   });
 };
 
+
   // LOGIN
   const handleLogin = (userData) => {
-    setIsAuthenticated(true);
-    setBalance(userData.balance ?? 50000);
+  setIsAuthenticated(true);
 
-    const formattedHoldings = {};
+  setBalance(userData.balance ?? 50000);
 
-    if (userData.holdings && userData.holdings.length > 0) {
-      userData.holdings.forEach((stock) => {
-        formattedHoldings[stock.symbol] = {
-          quantity: stock.quantity,
-          avgBuyPrice: stock.buyPrice,
-          buyDate: stock.buyDate,
-          name: stock.name,
-        };
-      });
-    }
+  const formattedHoldings = {};
 
-    setHoldings(formattedHoldings);
+  if (userData.holdings && userData.holdings.length > 0) {
+    userData.holdings.forEach((stock) => {
+      formattedHoldings[stock.symbol] = {
+        quantity: stock.quantity,
+        avgBuyPrice: stock.buyPrice,
+        buyDate: stock.buyDate,
+        name: stock.name,
+      };
+    });
+  }
 
-    // Store which type of account is currently logged in
-    localStorage.setItem(
-      "accountType",
-      userData.isDemo ? "demo" : "normal"
-    );
-  };
+  setHoldings(formattedHoldings);
+
+  localStorage.setItem(
+    "accountType",
+    userData.isDemo ? "demo" : "normal"
+  );
+};
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setBalance(0);
-    setHoldings({});
-    setWatchlist([]);
-    localStorage.removeItem("accountType");
-  };
-
+  setIsAuthenticated(false);
+  setBalance(0);
+  setHoldings({});
+  setWatchlist([]);
+  localStorage.removeItem("accountType");
+};
   // BUY
   const handleBuy = (symbol, price, quantity) => {
+    if (!isAuthenticated) {
+      alert("Please login or use Demo Account to buy stocks.");
+      return false;
+    }
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
       return false;
@@ -151,6 +139,10 @@ function App() {
 
   // SELL
   const handleSell = (symbol, price, quantity) => {
+    if (!isAuthenticated) {
+      alert("Please login or use Demo Account to buy stocks.");
+      return false;
+    }
     if (!isMarketOpen()) {
       alert(getMarketStatusMessage());
       return false;
@@ -211,16 +203,21 @@ function App() {
             />
           }
         />
-
-        <Route
-          path="/watchlist"
-          element={
-            <WatchList
-              watchlist={watchlist}
-              toggleWatchlist={toggleWatchlist}
-            />
-          }
-        />
+      
+      <Route
+  path="/watchlist"
+  element={
+    isAuthenticated ? (
+      <WatchList
+        watchlist={watchlist}
+        toggleWatchlist={toggleWatchlist}
+      />
+    ) : (
+      <Login onLogin={handleLogin} />
+    )
+  }
+/>
+        
 
         <Route
           path="/stock/:symbol"
@@ -240,15 +237,19 @@ function App() {
         />
 
         <Route
-          path="/portfolio"
-          element={
-            <Portfolio
-              balance={balance}
-              holdings={holdings}
-              onSell={handleSell}
-            />
-          }
-        />
+  path="/portfolio"
+  element={
+    isAuthenticated ? (
+      <Portfolio
+        balance={balance}
+        holdings={holdings}
+        onSell={handleSell}
+      />
+    ) : (
+      <Login onLogin={handleLogin} />
+    )
+  }
+/>
         <Route
           path="/"
           element={
