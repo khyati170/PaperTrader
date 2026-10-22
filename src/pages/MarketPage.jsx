@@ -3,18 +3,18 @@ import { Link } from "react-router-dom";
 import StockCard from "../components/StockCard";
 import GainersLosersWidget from "../components/GainersLosersWidget";
 import SkeletonCard from "../components/SkeletonCard";
-import { getStocks, refreshStocks, simulateFetchFailure } from "../data/stocks"; // NEW: refreshStocks
-import { seedSeries } from "../utils/sparkline"; // NEW
+import { getStocks, refreshStocks, simulateFetchFailure } from "../data/stocks";
+import { seedSeries } from "../utils/sparkline";
 import "./MarketPage.css";
 
-const POLL_MS = 30000; // NEW: 30 sec
-const MAX_POINTS = 40; // NEW: chart mein kitne points
+const POLL_MS = 30000; // 30 sec
+const MAX_POINTS = 40; // chart mein kitne points
+const SECTOR_OPTIONS = ["IT", "Banking", "Auto", "Retail", "Entertainment", "Food"];
 
 export default function MarketPage({
   watchlist = [],
   toggleWatchlist = () => {},
 }) {
-  const [market, setMarket] = useState("us");
   const [stocks, setStocks] = useState([]);
   const [selectedSectors, setSelectedSectors] = useState([]);
   const [sortBy, setSortBy] = useState("default");
@@ -24,7 +24,10 @@ export default function MarketPage({
   const [fetchedAt, setFetchedAt] = useState(null);
   const [noData, setNoData] = useState(false);
 
-  // NEW: chart/basic preference (yaad rakhti hai)
+  // har stock ki rolling price history { AAPL: [..], ... }
+  const [history, setHistory] = useState({});
+
+  // chart/basic preference (yaad rakhti hai)
   const [viewMode, setViewMode] = useState(() => {
     try {
       return localStorage.getItem("marketView") || "chart";
@@ -33,9 +36,6 @@ export default function MarketPage({
     }
   });
 
-  // NEW: har stock ki rolling price history { AAPL: [..], ... }
-  const [history, setHistory] = useState({});
-
   const changeView = (mode) => {
     setViewMode(mode);
     try {
@@ -43,9 +43,9 @@ export default function MarketPage({
     } catch {}
   };
 
-  const loadStocks = (selectedMarket) => {
+  const loadStocks = () => {
     setIsLoading(true);
-    getStocks(selectedMarket)
+    getStocks()
       .then((result) => {
         setStocks(result.stocks);
         setIsStale(result.isStale);
@@ -56,30 +56,24 @@ export default function MarketPage({
       .finally(() => setIsLoading(false));
   };
 
-  const handleMarketSwitch = (newMarket) => {
-    setMarket(newMarket);
-    setSelectedSectors([]);
-    setMaxPrice(newMarket === "in" ? 5000 : 1000);
-  };
-
-  // Initial load + market switch
+  // Initial load
   useEffect(() => {
-    loadStocks(market);
-  }, [market]);
+    loadStocks();
+  }, []);
 
   // Hidden demo shortcut: Ctrl+Shift+X
   useEffect(() => {
     const handleShortcut = (e) => {
       if (e.ctrlKey && e.shiftKey && e.key === "X") {
         simulateFetchFailure();
-        loadStocks(market);
+        loadStocks();
       }
     };
     window.addEventListener("keydown", handleShortcut);
     return () => window.removeEventListener("keydown", handleShortcut);
-  }, [market]);
+  }, []);
 
-  // NEW: stocks badle to history mein naya point jodo
+  // stocks badle to history mein naya point jodo
   useEffect(() => {
     if (!stocks.length) return;
     setHistory((prev) => {
@@ -96,14 +90,14 @@ export default function MarketPage({
     });
   }, [stocks]);
 
-  // NEW: har 30 sec mein fresh data (polling)
+  // har 30 sec mein fresh data (polling)
   useEffect(() => {
     if (isLoading || noData) return;
     let cancelled = false;
 
     const id = setInterval(async () => {
       if (document.hidden) return; // tab background mein ho to skip
-      const result = await refreshStocks(market);
+      const result = await refreshStocks();
       if (cancelled || !result) return;
       setStocks(result.stocks);
       setIsStale(false);
@@ -114,7 +108,7 @@ export default function MarketPage({
       cancelled = true;
       clearInterval(id);
     };
-  }, [market, isLoading, noData]);
+  }, [isLoading, noData]);
 
   const handleSectorChange = (sector) => {
     setSelectedSectors((prev) =>
@@ -135,32 +129,10 @@ export default function MarketPage({
     filteredStocks.sort((a, b) => a.change - b.change);
   }
 
-  const sectorOptions =
-    market === "in"
-      ? ["IT", "Banking", "FMCG", "Energy", "Auto", "Pharma", "Infrastructure", "Telecom"]
-      : ["IT", "Banking", "Energy", "Auto"];
-
-  const currencySymbol = market === "in" ? "₹" : "$";
-
   return (
     <div className="market-page">
       <div className="market-header">
         <h1>Market</h1>
-      </div>
-
-      <div className="market-tabs">
-        <button
-          className={market === "us" ? "market-tab active" : "market-tab"}
-          onClick={() => handleMarketSwitch("us")}
-        >
-          🇺🇸 US Markets
-        </button>
-        <button
-          className={market === "in" ? "market-tab active" : "market-tab"}
-          onClick={() => handleMarketSwitch("in")}
-        >
-          🇮🇳 Indian Markets
-        </button>
       </div>
 
       {isStale && (
@@ -182,7 +154,7 @@ export default function MarketPage({
         <aside className="filter-sidebar">
           <div className="filter-group">
             <p className="filter-title">Sector</p>
-            {sectorOptions.map((sector) => (
+            {SECTOR_OPTIONS.map((sector) => (
               <label key={sector}>
                 <input
                   type="checkbox"
@@ -199,14 +171,11 @@ export default function MarketPage({
             <input
               type="range"
               min="0"
-              max={market === "in" ? "5000" : "1000"}
+              max="1000"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
             />
-            <p>
-              Up to {currencySymbol}
-              {maxPrice}
-            </p>
+            <p>Up to ${maxPrice}</p>
           </div>
 
           <div className="filter-group">
@@ -221,7 +190,6 @@ export default function MarketPage({
 
         {!noData && (
           <div className="stock-area">
-            {/* NEW: toolbar with live indicator + Chart/Basic toggle */}
             <div className="view-toolbar">
               <span className="view-count">
                 <i className="live-dot" /> Live · {filteredStocks.length} stocks · updates every 30s
@@ -245,7 +213,7 @@ export default function MarketPage({
               </div>
             </div>
 
-            <div className={`stock-grid ${viewMode}`}>
+            <div className="stock-grid">
               {isLoading
                 ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
                 : filteredStocks.map((stock, i) => (
@@ -262,7 +230,7 @@ export default function MarketPage({
                         symbol={stock.symbol}
                         company={stock.name}
                         price={stock.price}
-                        currency={currencySymbol}
+                        currency="$"
                         change={stock.change}
                         hp={stock.highprice}
                         lp={stock.lowprice}

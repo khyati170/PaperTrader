@@ -25,37 +25,6 @@
   letter-spacing: -0.01em;
 }
 
-/* ===== Market tabs (US / India) ===== */
-
-.market-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 0 0 22px;
-}
-
-.market-tab {
-  padding: 10px 20px;
-  border: 1px solid var(--navbar-border);
-  border-radius: 10px;
-  background-color: var(--color-bg-alt);
-  color: var(--color-eyebrow);
-  font-family: 'Schibsted Grotesk', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
-}
-
-.market-tab:hover {
-  transform: translateY(-1px);
-}
-
-.market-tab.active {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-bg);
-}
 
 /* ===== Stale / no-data banners ===== */
 
@@ -625,14 +594,6 @@
 }
 
 @media (max-width: 480px) {
-  .market-tabs {
-    flex-direction: column;
-  }
-
-  .market-tab {
-    width: 100%;
-    text-align: center;
-  }
 
   .view-toolbar {
     flex-direction: column;

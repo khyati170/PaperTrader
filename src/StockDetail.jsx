@@ -25,7 +25,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
         getStocks()
             .then((allStocks) => {
                 if (!isMounted) return;
-                setStock(allStocks.find((s) => s.symbol === symbol) || null);
+                setStock(allStocks.stocks.find((s) => s.symbol === symbol) || null);
                 setLoading(false);
             })
             .catch(() => {
