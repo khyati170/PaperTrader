@@ -38,6 +38,21 @@ const validateLogin = (v) => {
 const getUsers = () => JSON.parse(localStorage.getItem("users") || "[]");
 const saveUsers = (users) => localStorage.setItem("users", JSON.stringify(users));
 
+// Returning user ka last saved balance (App.jsx ki saved data se)
+const getSavedBalance = (email) => {
+    try {
+        const raw = localStorage.getItem(`paperTrader:data:${email}`);
+        if (!raw) return null;
+        const balance = JSON.parse(raw).balance;
+        return typeof balance === "number" ? balance : null;
+    } catch {
+        return null;
+    }
+};
+
+const formatMoney = (n) =>
+    `$${Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 const emptySignup = { name: "", age: "", phone: "", email: "", password: "", confirmPassword: "" };
 
 function Login({ onLogin }) {
@@ -58,14 +73,22 @@ function Login({ onLogin }) {
     const updateLogin = (field) => (e) =>
         setLogin((prev) => ({ ...prev, [field]: e.target.value }));
 
+    // Age: sirf digits allowed (-, ., e type hi nahi honge), max 3 digits
+    const updateAge = (e) => {
+        const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 3);
+        setSignup((prev) => ({ ...prev, age: digitsOnly }));
+    };
+
     const switchMode = (newMode) => {
         setMode(newMode);
         setErrors({});
         setFormError("");
     };
 
-    const completeLogin = (user) => {
-        // Auth slice aane ke baad yahan dispatch(login(...)) lagega (teammate B ke saath decide karo)
+    const completeLogin = (user, isNewUser = false) => {
+        // Saved balance login se PEHLE padhna hai (purane trades ke baad ka balance)
+        const saved = isNewUser ? null : getSavedBalance(user.email);
+
         onLogin({
             name: user.name,
             email: user.email,
@@ -74,12 +97,19 @@ function Login({ onLogin }) {
             isDemo: user.isDemo ?? false,
         });
 
-        showToast(
-            user.isDemo
-                ? `Welcome, ${user.name}! Your demo portfolio is ready.`
-                : `Welcome, ${user.name}! You've got a $50,000 virtual wallet.`,
-            "success"
-        );
+        let message;
+        if (isNewUser) {
+            message = `Welcome, ${user.name}! $50,000 virtual cash has been added to your wallet.`;
+        } else if (saved !== null) {
+            // Returning user (ya demo jisme pehle trade ho chuka hai)
+            message = `You are successfully logged in, ${user.name}! Your wallet balance is ${formatMoney(saved)}.`;
+        } else if (user.isDemo) {
+            message = `Welcome, ${user.name}! Your demo portfolio is ready.`;
+        } else {
+            message = `You are successfully logged in, ${user.name}!`;
+        }
+
+        showToast(message, "success");
         navigate(redirectTo, { replace: true });
     };
 
@@ -102,7 +132,7 @@ function Login({ onLogin }) {
             email: signup.email, password: signup.password,
         };
         saveUsers([...users, newUser]);
-        completeLogin(newUser);
+        completeLogin(newUser, true);
     };
 
     const handleLoginSubmit = (e) => {
@@ -172,8 +202,8 @@ function Login({ onLogin }) {
 
                         <div className="auth-row">
                             <div>
-                                <FormField id="age" label="Age" type="number"
-                                    value={signup.age} onChange={updateSignup("age")}
+                                <FormField id="age" label="Age" type="text" inputMode="numeric"
+                                    value={signup.age} onChange={updateAge}
                                     placeholder="Age" error={errors.age} />
                             </div>
                             <div>

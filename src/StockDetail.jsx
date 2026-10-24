@@ -1,23 +1,77 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getStocks } from "./data/stocks.js";
-import BuySellForm from "./components/BuySellForm.jsx";
+import {getQuote,getProfile,getMetrics,getRatings,getPeers,getNews,} from "./data/stockExtras.js";
+import { isMarketOpen } from "./config/marketConfig.js";
+import TradeModal from "./components/TradeModal.jsx";
 import "./stockDetail.css";
 
+const POLL_MS = 30000;
+const MAX_POINTS = 60;
 
-function StockDetail({ balance, holdings, onBuy, onSell }) {
+const usd = (n) =>
+    n == null || Number.isNaN(Number(n))
+        ? "—"
+        : `$${Number(n).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        })}`;
+
+// Finnhub market cap millions of USD mein deta hai
+const formatMarketCap = (millions) => {
+    if (!millions) return "—";
+    if (millions >= 1e6) return `$${(millions / 1e6).toFixed(2)}T`;
+    if (millions >= 1e3) return `$${(millions / 1e3).toFixed(1)}B`;
+    return `$${millions.toFixed(0)}M`;
+};
+
+const timeLabel = () =>
+    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+const timeAgo = (unixSeconds) => {
+    const diff = Math.floor(Date.now() / 1000) - unixSeconds;
+    if (diff < 3600) return `${Math.max(1, Math.floor(diff / 60))} min ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    return `${Math.floor(diff / 86400)} days ago`;
+};
+
+const EMPTY_EXTRAS = {
+    loaded: false,
+    profile: null,
+    metrics: null,
+    ratings: null,
+    peers: null,
+    news: null,
+};
+
+function StockDetail({
+    balance,
+    holdings,
+    onBuy,
+    onSell,
+    watchlist = [],
+    toggleWatchlist = () => { },
+}) {
     const { symbol } = useParams();
     const navigate = useNavigate();
 
     const [stock, setStock] = useState(null);
+    const [allStocks, setAllStocks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const [activeTab, setActiveTab] = useState("overview");
+    const [series, setSeries] = useState([]);
+    const [extras, setExtras] = useState(EMPTY_EXTRAS);
+    const [infoTab, setInfoTab] = useState("news");
+
+    const [tradeMode, setTradeMode] = useState(null); // null | "buy" | "sell"
     const [showSuccess, setShowSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
-    // Load the stock data
+    const hasStock = stock !== null;
+
+    // 1. Stock ka data load karo
     useEffect(() => {
         let isMounted = true;
         setLoading(true);
@@ -27,7 +81,20 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
             .then((result) => {
                 if (!isMounted) return;
                 const list = result?.stocks || [];
-                setStock(list.find((s) => s.symbol === symbol) || null);
+                const found = list.find((s) => s.symbol === symbol) || null;
+
+                setAllStocks(list);
+                setStock(found);
+
+                // Chart ki shuruaat: Open se abhi tak
+                if (found) {
+                    setSeries([
+                        { label: "Open", price: found.openprice || found.price },
+                        { label: timeLabel(), price: found.price },
+                    ]);
+                } else {
+                    setSeries([]);
+                }
                 setLoading(false);
             })
             .catch(() => {
@@ -36,39 +103,85 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
                 setLoading(false);
             });
 
-        return () => { isMounted = false; };
+        return () => {
+            isMounted = false;
+        };
     }, [symbol]);
 
-    // Redirect to portfolio 3.5s after a successful trade
-    // (the timer is cancelled if the user leaves the page early)
+    // 2. Extra data (profile, stats, ratings, peers, news)
+    useEffect(() => {
+        let alive = true;
+        setExtras(EMPTY_EXTRAS);
+        setInfoTab("news");
+
+        Promise.all([
+            getProfile(symbol),
+            getMetrics(symbol),
+            getRatings(symbol),
+            getPeers(symbol),
+            getNews(symbol),
+        ]).then(([profile, metrics, ratings, peers, news]) => {
+            if (!alive) return;
+            setExtras({ loaded: true, profile, metrics, ratings, peers, news });
+        });
+
+        return () => {
+            alive = false;
+        };
+    }, [symbol]);
+
+    // 3. Market khula ho to har 30 sec mein fresh price (sirf 1 API call)
+    useEffect(() => {
+        if (!hasStock || !isMarketOpen()) return;
+        let cancelled = false;
+
+        const id = setInterval(async () => {
+            if (document.hidden) return; // tab background mein ho to skip
+            const quote = await getQuote(symbol);
+            if (cancelled || !quote) return;
+
+            setStock((prev) => (prev ? { ...prev, ...quote } : prev));
+            setSeries((prev) =>
+                [...prev, { label: timeLabel(), price: quote.price }].slice(-MAX_POINTS)
+            );
+        }, POLL_MS);
+
+        return () => {
+            cancelled = true;
+            clearInterval(id);
+        };
+    }, [symbol, hasStock]);
+
+    // 4. Trade ke baad 3.5 sec mein portfolio par redirect
     useEffect(() => {
         if (!showSuccess) return;
         const id = setTimeout(() => navigate("/portfolio"), 3500);
         return () => clearTimeout(id);
     }, [showSuccess, navigate]);
 
-    // How many shares of this stock the user owns
-    const ownedShares = holdings[symbol]?.quantity || 0;
+    // ---------- Trade handler (modal ke Confirm se chalta hai) ----------
+    const ownedShares = Number(holdings[symbol]?.quantity) || 0;
+    const avgBuyPrice = Number(holdings[symbol]?.avgBuyPrice) || 0;
 
-    const finishTrade = (message) => {
-        setSuccessMessage(message);
+    const handleTrade = (quantity) => {
+        const isBuy = tradeMode === "buy";
+        const success = isBuy
+            ? onBuy(stock.symbol, stock.price, quantity)
+            : onSell(stock.symbol, stock.price, quantity);
+
+        if (success === false) return false; // modal khula rahega
+
+        setTradeMode(null);
+        setSuccessMessage(
+            isBuy
+                ? `You've successfully bought ${quantity} share(s) of ${stock.symbol}.`
+                : `You've successfully sold ${quantity} share(s) of ${stock.symbol}.`
+        );
         setShowSuccess(true);
+        return true;
     };
 
-    const handleBuy = (stockArg, quantity) => {
-        const success = onBuy(stockArg.symbol, stockArg.price, quantity);
-        if (!success) return;
-
-        finishTrade("You've successfully bought the shares.");
-    };
-
-    const handleSell = (stockArg, quantity) => {
-        const success = onSell(stockArg.symbol, stockArg.price, quantity);
-        if (!success) return;
-
-        finishTrade("You've successfully sold the shares.");
-    };
-
+    // ---------- Early returns (saare hooks upar ho chuke hain) ----------
     if (loading) return <p className="loading-text">Loading {symbol}...</p>;
 
     if (error) {
@@ -91,12 +204,58 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
         );
     }
 
-    // Calculations for the Price History tab
+    // ---------- Calculations ----------
+    const { profile, metrics, ratings, peers, news } = extras;
+    const marketOpen = isMarketOpen();
+    const isWatchlisted = watchlist.includes(stock.symbol);
+
     const dayChange = stock.price - stock.previousclose;
+    const changePct = Number(stock.change) || 0;
+    const up = dayChange >= 0;
+
     const rangeSpan = stock.highprice - stock.lowprice;
-    const rangePercent = rangeSpan > 0
-        ? Math.min(100, Math.max(0, ((stock.price - stock.lowprice) / rangeSpan) * 100))
+    const rangePercent =
+        rangeSpan > 0
+            ? Math.min(100, Math.max(0, ((stock.price - stock.lowprice) / rangeSpan) * 100))
+            : 50;
+
+    const sessionStart = series[0]?.price || stock.price;
+    const sessionChange = sessionStart ? ((stock.price - sessionStart) / sessionStart) * 100 : 0;
+
+    // Your position
+    const marketValue = stock.price * ownedShares;
+    const positionPL = (stock.price - avgBuyPrice) * ownedShares;
+    const positionPLPct = avgBuyPrice > 0 ? (stock.price / avgBuyPrice - 1) * 100 : 0;
+
+    // Signal (simple: aaj ke price change par based)
+    let signal = { label: "HOLD", index: 1, text: "Price is within its normal range today." };
+    if (changePct >= 2) {
+        signal = { label: "BUY", index: 2, text: "Price is rising strongly today." };
+    } else if (changePct <= -2) {
+        signal = { label: "SELL", index: 0, text: "Price is falling sharply today." };
+    }
+
+    // 52-week bar
+    const has52 = metrics?.high52 != null && metrics?.low52 != null && metrics.high52 > metrics.low52;
+    const range52Percent = has52
+        ? Math.min(100, Math.max(0, ((stock.price - metrics.low52) / (metrics.high52 - metrics.low52)) * 100))
         : 50;
+
+    // Analyst ratings
+    const ratingRows = ratings
+        ? [
+            { key: "strongBuy", label: "Strong buy", count: ratings.strongBuy, color: "#0b5a43" },
+            { key: "buy", label: "Buy", count: ratings.buy, color: "#5dae8b" },
+            { key: "hold", label: "Hold", count: ratings.hold, color: "#e0902b" },
+            { key: "sell", label: "Sell", count: ratings.sell, color: "#d9826b" },
+            { key: "strongSell", label: "Strong sell", count: ratings.strongSell, color: "#a5432d" },
+        ]
+        : [];
+    const ratingsTotal = ratingRows.reduce((sum, r) => sum + r.count, 0);
+
+    // Similar stocks: sirf wahi jo humare market list mein hain (taaki click par page khule)
+    const knownSymbols = new Set(allStocks.map((s) => s.symbol));
+    const similar = (peers || []).filter((s) => knownSymbols.has(s)).slice(0, 6);
 
     return (
         <main className="stock-detail">
@@ -111,87 +270,351 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
                 </div>
             )}
 
-            <section className="stock-header">
-                <div>
-                    <p className="stock-symbol">{stock.symbol}</p>
-                    <h1>{stock.name || stock.symbol}</h1>
-                    <div className="price-row">
-                        <span className="stock-price">${stock.price?.toFixed(2)}</span>
-                        <span className={stock.change >= 0 ? "positive-text" : "negative-text"}>
-                            {stock.change >= 0 ? "+" : ""}{stock.change?.toFixed(2)}%
-                        </span>
+            <nav className="sd-breadcrumb">
+                <Link to="/market">Market</Link> / <b>{stock.symbol}</b>
+            </nav>
+
+            {/* ---------- Header ---------- */}
+            <section className="sd-card sd-header">
+                <div className="sd-id">
+                    {profile?.logo ? (
+                        <img className="sd-logo" src={profile.logo} alt="" />
+                    ) : (
+                        <div className="sd-logo sd-logo-fallback">{stock.symbol.slice(0, 2)}</div>
+                    )}
+
+                    <div className="sd-id-text">
+                        <div className="sd-title-row">
+                            <h1>{stock.name || stock.symbol}</h1>
+                            <span className="sd-tag">{stock.symbol}</span>
+                            {stock.sector && <span className="sd-tag">{stock.sector}</span>}
+                        </div>
+
+                        <div className="sd-price-row">
+                            <span className="sd-price">{usd(stock.price)}</span>
+                            <span className={up ? "sd-change up" : "sd-change down"}>
+                                {up ? "+" : "-"}${Math.abs(dayChange).toFixed(2)} ({up ? "+" : ""}
+                                {changePct.toFixed(2)}%)
+                            </span>
+                            <span className={marketOpen ? "sd-badge open" : "sd-badge closed"}>
+                                <i /> {marketOpen ? "Market open" : "Market closed"}
+                            </span>
+                        </div>
                     </div>
                 </div>
-                <p className="balance-display">Balance: ${balance.toFixed(2)}</p>
+
+                <div className="sd-actions-wrap">
+                    <div className="sd-actions">
+                        <button
+                            className={isWatchlisted ? "sd-star active" : "sd-star"}
+                            onClick={() => toggleWatchlist(stock.symbol)}
+                            aria-pressed={isWatchlisted}
+                            aria-label={isWatchlisted ? "Remove from watchlist" : "Add to watchlist"}
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill={isWatchlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8z" />
+                            </svg>
+                        </button>
+                        <button className="sd-btn buy" onClick={() => setTradeMode("buy")}>Buy</button>
+                        <button className="sd-btn sell" onClick={() => setTradeMode("sell")}>Sell</button>
+                    </div>
+                    <p className="sd-balance">
+                        Available balance <b>{usd(balance)}</b>
+                    </p>
+                </div>
             </section>
 
-            <div className="detail-tabs">
-                <button
-                    className={`detail-tab ${activeTab === "overview" ? "active" : ""}`}
-                    onClick={() => setActiveTab("overview")}
-                >
-                    Overview
-                </button>
-                <button
-                    className={`detail-tab ${activeTab === "history" ? "active" : ""}`}
-                    onClick={() => setActiveTab("history")}
-                >
-                    Price History
-                </button>
+            {/* ---------- Chart ---------- */}
+            <section className="sd-card">
+                <div className="sd-chart-head">
+                    <span className="sd-muted">
+                        {marketOpen
+                            ? "Live, updates every 30 seconds"
+                            : "Market is closed. Showing the latest available prices."}
+                    </span>
+                    <span className={sessionChange >= 0 ? "sd-up-text" : "sd-down-text"}>
+                        {sessionChange >= 0 ? "+" : ""}
+                        {sessionChange.toFixed(2)}% this session
+                    </span>
+                </div>
+
+                <div className="sd-chart">
+                    <ResponsiveContainer width="100%" height={240}>
+                        <AreaChart data={series} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                            <defs>
+                                <linearGradient id="sdFill" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.25} />
+                                    <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0} />
+                                </linearGradient>
+                            </defs>
+                            <XAxis
+                                dataKey="label"
+                                tick={{ fontSize: 11, fill: "var(--color-eyebrow)" }}
+                                tickLine={false}
+                                axisLine={false}
+                                minTickGap={30}
+                            />
+                            <YAxis
+                                domain={["auto", "auto"]}
+                                tick={{ fontSize: 11, fill: "var(--color-eyebrow)" }}
+                                tickFormatter={(v) => `$${Number(v).toFixed(2)}`}
+                                width={68}
+                                tickLine={false}
+                                axisLine={false}
+                            />
+                            <Tooltip
+                                formatter={(v) => [usd(v), "Price"]}
+                                contentStyle={{
+                                    background: "var(--color-bg-alt)",
+                                    border: "none",
+                                    borderRadius: 8,
+                                    color: "var(--color-heading)",
+                                }}
+                            />
+                            <Area
+                                type="monotone"
+                                dataKey="price"
+                                stroke="var(--color-accent)"
+                                strokeWidth={2.2}
+                                fill="url(#sdFill)"
+                                isAnimationActive={false}
+                            />
+                        </AreaChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div className="sd-ohlc">
+                    <div><span>Open</span><b>{usd(stock.openprice)}</b></div>
+                    <div><span>Prev close</span><b>{usd(stock.previousclose)}</b></div>
+                    <div><span>Day high</span><b className="sd-up-text">{usd(stock.highprice)}</b></div>
+                    <div><span>Day low</span><b className="sd-down-text">{usd(stock.lowprice)}</b></div>
+                </div>
+
+                <div className="sd-range">
+                    <div className="sd-range-fill" style={{ width: `${rangePercent}%` }} />
+                    <div className="sd-range-dot" style={{ left: `${rangePercent}%` }} />
+                </div>
+            </section>
+
+            {/* ---------- Position + Signal ---------- */}
+            <div className="sd-grid-2">
+                <section className="sd-card">
+                    <h2 className="sd-card-title">Your position</h2>
+                    {ownedShares > 0 ? (
+                        <div className="sd-rows">
+                            <div><span>Shares owned</span><b>{ownedShares}</b></div>
+                            <div><span>Avg buy price</span><b>{usd(avgBuyPrice)}</b></div>
+                            <div><span>Market value</span><b>{usd(marketValue)}</b></div>
+                            <div>
+                                <span>Profit / loss</span>
+                                <b className={positionPL >= 0 ? "sd-pill up" : "sd-pill down"}>
+                                    {positionPL >= 0 ? "+" : "-"}${Math.abs(positionPL).toFixed(2)} (
+                                    {positionPLPct >= 0 ? "+" : ""}
+                                    {positionPLPct.toFixed(2)}%)
+                                </b>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="sd-muted">You don't own any shares of {stock.symbol} yet.</p>
+                    )}
+                </section>
+
+                <section className="sd-card">
+                    <div className="sd-signal-head">
+                        <h2 className="sd-card-title">Signal</h2>
+                        <span className="sd-signal-badge">{signal.label}</span>
+                    </div>
+                    <div className="sd-signal-bar">
+                        <i className={signal.index === 0 ? "seg sell on" : "seg sell"} />
+                        <i className={signal.index === 1 ? "seg hold on" : "seg hold"} />
+                        <i className={signal.index === 2 ? "seg buy on" : "seg buy"} />
+                    </div>
+                    <div className="sd-signal-labels">
+                        <span>Sell</span>
+                        <span>Hold</span>
+                        <span>Buy</span>
+                    </div>
+                    <p className="sd-signal-text">{signal.text}</p>
+                    <p className="sd-note">Based on today's price change. Not financial advice.</p>
+                </section>
             </div>
 
-            {activeTab === "overview" && (
-                <section className="fundamentals">
-                    <h2>Price Details</h2>
-                    <table>
-                        <tbody>
-                            <tr><td>Sector</td><td>{stock.sector}</td></tr>
-                            <tr><td>High Price</td><td>${stock.highprice}</td></tr>
-                            <tr><td>Low Price</td><td>${stock.lowprice}</td></tr>
-                            <tr><td>Opening Price</td><td>${stock.openprice}</td></tr>
-                            <tr><td>Previous Close</td><td>${stock.previousclose}</td></tr>
-                        </tbody>
-                    </table>
+            {/* ---------- Key stats + Analyst ratings ---------- */}
+            <div className="sd-grid-2">
+                <section className="sd-card">
+                    <h2 className="sd-card-title">Key stats</h2>
+                    {!extras.loaded ? (
+                        <p className="sd-muted">Loading...</p>
+                    ) : !metrics ? (
+                        <p className="sd-muted">Key stats aren't available right now.</p>
+                    ) : (
+                        <>
+                            <p className="sd-sub">52-week range</p>
+                            {has52 ? (
+                                <>
+                                    <div className="sd-range wide">
+                                        <div className="sd-range-dot" style={{ left: `${range52Percent}%` }} />
+                                    </div>
+                                    <div className="sd-range-labels">
+                                        <span>Low {usd(metrics.low52)}</span>
+                                        <span>High {usd(metrics.high52)}</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="sd-muted">—</p>
+                            )}
+
+                            <div className="sd-stats-grid">
+                                <div><span>Market cap</span><b>{formatMarketCap(profile?.marketCapitalization)}</b></div>
+                                <div><span>P/E ratio</span><b>{metrics.pe != null ? metrics.pe.toFixed(2) : "—"}</b></div>
+                                <div><span>Beta</span><b>{metrics.beta != null ? metrics.beta.toFixed(2) : "—"}</b></div>
+                                <div>
+                                    <span>Dividend yield</span>
+                                    <b>{metrics.dividendYield != null ? `${metrics.dividendYield.toFixed(2)}%` : "—"}</b>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </section>
+
+                <section className="sd-card">
+                    <h2 className="sd-card-title">Analyst ratings</h2>
+                    {!extras.loaded ? (
+                        <p className="sd-muted">Loading...</p>
+                    ) : !ratings || ratingsTotal === 0 ? (
+                        <p className="sd-muted">Analyst ratings aren't available right now.</p>
+                    ) : (
+                        <>
+                            <div className="sd-ratings-bar">
+                                {ratingRows
+                                    .filter((r) => r.count > 0)
+                                    .map((r) => (
+                                        <div key={r.key} style={{ flex: r.count, background: r.color }} />
+                                    ))}
+                            </div>
+                            <div className="sd-ratings-list">
+                                {ratingRows.map((r) => (
+                                    <div key={r.key}>
+                                        <span>
+                                            <i style={{ background: r.color }} />
+                                            {r.label}
+                                        </span>
+                                        <b>{r.count}</b>
+                                    </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </section>
+            </div>
+
+            {/* ---------- News / About ---------- */}
+            <section className="sd-card">
+                <div className="sd-tabs" role="tablist">
+                    <button
+                        role="tab"
+                        aria-selected={infoTab === "news"}
+                        className={infoTab === "news" ? "sd-tab active" : "sd-tab"}
+                        onClick={() => setInfoTab("news")}
+                    >
+                        News
+                    </button>
+                    <button
+                        role="tab"
+                        aria-selected={infoTab === "about"}
+                        className={infoTab === "about" ? "sd-tab active" : "sd-tab"}
+                        onClick={() => setInfoTab("about")}
+                    >
+                        About
+                    </button>
+                </div>
+
+                {infoTab === "news" && (
+                    <>
+                        {!extras.loaded ? (
+                            <p className="sd-muted">Loading...</p>
+                        ) : !news || news.length === 0 ? (
+                            <p className="sd-muted">No recent news for {stock.symbol}.</p>
+                        ) : (
+                            <div className="sd-news">
+                                {news.map((n) => (
+                                    <a
+                                        key={n.id || n.url}
+                                        href={n.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="sd-news-item"
+                                    >
+                                        {n.image ? (
+                                            <img className="sd-news-thumb" src={n.image} alt="" loading="lazy" />
+                                        ) : (
+                                            <div className="sd-news-thumb" />
+                                        )}
+                                        <div>
+                                            <p className="sd-news-title">{n.title}</p>
+                                            <p className="sd-news-meta">
+                                                {n.source} · {timeAgo(n.datetime)}
+                                            </p>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {infoTab === "about" && (
+                    <>
+                        {!extras.loaded ? (
+                            <p className="sd-muted">Loading...</p>
+                        ) : !profile ? (
+                            <p className="sd-muted">Company info isn't available right now.</p>
+                        ) : (
+                            <div className="sd-stats-grid">
+                                <div><span>Industry</span><b>{profile.finnhubIndustry || "—"}</b></div>
+                                <div><span>Exchange</span><b>{profile.exchange || "—"}</b></div>
+                                <div><span>IPO date</span><b>{profile.ipo || "—"}</b></div>
+                                <div>
+                                    <span>Website</span>
+                                    <b>
+                                        {profile.weburl ? (
+                                            <a href={profile.weburl} target="_blank" rel="noopener noreferrer">
+                                                {profile.weburl.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")}
+                                            </a>
+                                        ) : (
+                                            "—"
+                                        )}
+                                    </b>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+            </section>
+
+            {/* ---------- Similar stocks ---------- */}
+            {similar.length > 0 && (
+                <section className="sd-card sd-peers">
+                    <span className="sd-peers-title">Similar stocks</span>
+                    {similar.map((s) => (
+                        <Link key={s} to={`/stock/${s}`} className="sd-chip">
+                            {s}
+                        </Link>
+                    ))}
                 </section>
             )}
 
-            {activeTab === "history" && (
-                <section className="fundamentals">
-                    <h2>Today's Movement</h2>
-                    <table>
-                        <tbody>
-                            <tr><td>Previous Close</td><td>${stock.previousclose}</td></tr>
-                            <tr><td>Today's Open</td><td>${stock.openprice}</td></tr>
-                            <tr><td>Current Price</td><td>${stock.price?.toFixed(2)}</td></tr>
-                            <tr>
-                                <td>Change vs Previous Close</td>
-                                <td className={dayChange >= 0 ? "positive-text" : "negative-text"}>
-                                    {dayChange >= 0 ? "+" : ""}${dayChange.toFixed(2)}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <p className="range-title">Today's Range</p>
-                    <div className="range-bar">
-                        <div className="range-marker" style={{ left: `${rangePercent}%` }} />
-                    </div>
-                    <div className="range-labels">
-                        <span>Low ${stock.lowprice}</span>
-                        <span>High ${stock.highprice}</span>
-                    </div>
-
-                </section>
-            )}
-
-            <BuySellForm
+            {/* ---------- Buy / Sell modal ---------- */}
+            <TradeModal
+                isOpen={tradeMode !== null}
+                mode={tradeMode}
                 stock={{ symbol: stock.symbol, price: stock.price }}
                 ownedShares={ownedShares}
+                avgBuyPrice={avgBuyPrice}
                 balance={balance}
-                onBuy={handleBuy}
-                onSell={handleSell}
+                onConfirm={handleTrade}
+                onCancel={() => setTradeMode(null)}
             />
-       
         </main>
     );
 }
