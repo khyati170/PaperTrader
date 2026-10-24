@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import NewsPage from "./pages/NewsPage";
 import {
   isMarketOpen,
   getMarketStatusMessage,
@@ -260,6 +260,11 @@ function App() {
         <Route
           path="/lessons"
           element={<Lessons />}/>
+
+          <Route
+  path="/news"
+  element={<NewsPage holdings={holdings} />}
+/>
      
       </Routes>
     </BrowserRouter>

@@ -54,6 +54,9 @@ function Navbar({ isAuthenticated, balance, onLogout }) {
         >
           Watchlist
         </NavLink>
+
+        <NavLink to="/news" onClick={() => setMenuOpen(false1)}>
+        News</NavLink>
         <NavLink to="/lessons" onClick={() => setMenuOpen(false)}>
           Learn
         </NavLink>
