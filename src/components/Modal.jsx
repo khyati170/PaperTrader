@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 function Modal({
     isOpen, title, children, onConfirm, onCancel,
@@ -14,7 +15,7 @@ function Modal({
 
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div className="modal-overlay" onClick={onCancel}>
             <div className="modal-box" onClick={(e) => e.stopPropagation()}>
                 <h3>{title}</h3>
@@ -24,7 +25,8 @@ function Modal({
                     <button className={confirmClass} onClick={onConfirm}>{confirmText}</button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

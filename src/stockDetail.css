@@ -47,26 +47,27 @@
     font-weight: 700;
 }
 
+/* Gain / loss pills (used in stock header, history tab and gainers/losers) */
+.positive-text,
+.negative-text {
+    display: inline-block;
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 20px;
+    margin: 2px;
+    white-space: normal;
+}
+
 .positive-text {
     color: var(--color-gain);
     background: color-mix(in srgb, var(--color-gain) 15%, transparent);
-    font-family: 'Public Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: inline-block;
 }
 
 .negative-text {
     color: var(--color-loss);
     background: color-mix(in srgb, var(--color-loss) 15%, transparent);
-    font-family: 'Public Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: inline-block;
 }
 
 .balance-display {
@@ -94,6 +95,8 @@
     font-size: 0.9rem;
 }
 
+
+/* ---------- Fundamentals / tables ---------- */
 
 .fundamentals {
     background: var(--color-bg-alt);
@@ -148,6 +151,8 @@ tr:last-child td {
     border-bottom: none;
 }
 
+
+/* ---------- Buy / Sell panels ---------- */
 
 .trade-section {
     display: flex;
@@ -247,14 +252,13 @@ tr:last-child td {
 }
 
 
-/* ===== Gainers / Losers ===== */
+/* ---------- Gainers / Losers ---------- */
 
 .gainers-losers {
     display: flex;
     justify-content: space-between;
     gap: 24px;
     flex-wrap: wrap;
-
     background: var(--color-bg-alt);
     border: 1px solid var(--navbar-border);
     border-radius: 14px;
@@ -272,37 +276,19 @@ tr:last-child td {
     margin-bottom: 12px;
 }
 
-.gainers-losers>div {
+.gainers-losers > div {
     flex: 1;
     min-width: 0;
 }
 
-.gainers-losers>div>div {
+.gainers-losers > div > div {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
 }
 
-.positive-text,
-.negative-text {
-    display: inline-block;
-    font-family: 'Public Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 20px;
-    margin: 2px;
-    white-space: normal;
-}
 
-.positive-text {
-    color: var(--color-gain);
-}
-
-.negative-text {
-    color: var(--color-loss);
-}
-
+/* ---------- Responsive ---------- */
 
 @media (max-width: 768px) {
     .gainers-losers {
@@ -310,7 +296,6 @@ tr:last-child td {
         gap: 16px;
     }
 }
-
 
 @media (max-width: 600px) {
     .stock-header {
@@ -320,10 +305,6 @@ tr:last-child td {
     }
 
     .trade-section {
-        flex-direction: column;
-    }
-
-    .gainers-losers {
         flex-direction: column;
     }
 
@@ -459,7 +440,7 @@ tr:last-child td {
     gap: 12px;
 }
 
-.auth-row>div {
+.auth-row > div {
     flex: 1;
 }
 
@@ -525,6 +506,8 @@ tr:last-child td {
 }
 
 
+/* ---------- Demo login ---------- */
+
 .demo-divider {
     display: flex;
     align-items: center;
@@ -540,31 +523,7 @@ tr:last-child td {
     content: "";
     flex: 1;
     height: 1px;
-    background: var(--color-bg-alt);
-}
-
-.demo-divider span {
-    white-space: nowrap;
-}
-
-
-
-.demo-divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 20px 0 14px;
-    color: #888;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.demo-divider::before,
-.demo-divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #ddd;
+    background: var(--color-bg);
 }
 
 .demo-divider span {
@@ -574,22 +533,19 @@ tr:last-child td {
 .demo-login-button {
     width: 100%;
     padding: 12px 16px;
-
     background: transparent;
     color: var(--color-subheading);
-
-    border: 1px solid var(--color-bg-alt);
+    border: 1px solid color-mix(in srgb, var(--color-eyebrow) 40%, transparent);
     border-radius: 8px;
-
+    font-family: 'Public Sans', sans-serif;
     font-size: 14px;
     font-weight: 600;
-
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .demo-login-button:hover {
-    background: var(--color-bg-alt);
+    background: var(--color-bg);
     border-color: var(--color-accent);
     transform: translateY(-1px);
 }
@@ -597,21 +553,6 @@ tr:last-child td {
 .demo-login-button:active {
     transform: translateY(0);
 }
-
-
-body.dark .demo-divider {
-    color: #aaa;
-}
-
-body.dark .demo-divider::before,
-body.dark .demo-divider::after {
-    background: #444;
-}
-
-body.dark .demo-login-button {
-    background: transparent;
-}
-
 
 
 @keyframes slideDown {
@@ -626,10 +567,7 @@ body.dark .demo-login-button {
     }
 }
 
-
-
 @media (max-width: 480px) {
-
     .auth-page::before,
     .auth-page::after {
         width: 250px;
@@ -641,7 +579,9 @@ body.dark .demo-login-button {
     }
 }
 
-/* ---------- Buy success overlay ---------- */
+
+/* ---------- Buy / Sell success overlay ---------- */
+
 .success-overlay {
     position: fixed;
     top: 0;
@@ -700,7 +640,9 @@ body.dark .demo-login-button {
     }
 }
 
+
 /* ---------- Toast ---------- */
+
 .toast-container {
     position: fixed;
     top: 20px;
@@ -745,7 +687,9 @@ body.dark .demo-login-button {
     }
 }
 
+
 /* ---------- Modal ---------- */
+
 .modal-overlay {
     position: fixed;
     inset: 0;
@@ -795,12 +739,14 @@ body.dark .demo-login-button {
     border: 1px solid var(--color-eyebrow);
     background: transparent;
     color: var(--color-subheading);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Public Sans', sans-serif;
     font-weight: 600;
     font-size: 14px;
 }
 
+
 /* ---------- Inline validation errors (BuySell + Login) ---------- */
+
 .field-error,
 .trade-panel .field-error,
 .auth-form .field-error {
@@ -824,7 +770,9 @@ input.input-error,
     background: color-mix(in srgb, var(--color-loss) 15%, transparent);
 }
 
-//css of tabs in stock detail page
+
+/* ---------- Tabs in stock detail page ---------- */
+
 .detail-tabs {
     display: flex;
     gap: 10px;
@@ -838,7 +786,7 @@ input.input-error,
     cursor: pointer;
     background: var(--color-bg-alt);
     color: var(--color-eyebrow);
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Public Sans', sans-serif;
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 10px;
@@ -880,4 +828,16 @@ input.input-error,
     justify-content: space-between;
     font-size: 12px;
     color: var(--color-eyebrow);
+}
+
+.logout-confirm {
+    background: #e5484d;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.logout-confirm:hover {
+    background: #cd3a3f;
 }

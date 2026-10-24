@@ -17,15 +17,17 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
 
+    // Load the stock data
     useEffect(() => {
         let isMounted = true;
         setLoading(true);
         setError(false);
 
         getStocks()
-            .then((allStocks) => {
+            .then((result) => {
                 if (!isMounted) return;
-                setStock(allStocks.stocks.find((s) => s.symbol === symbol) || null);
+                const list = result?.stocks || [];
+                setStock(list.find((s) => s.symbol === symbol) || null);
                 setLoading(false);
             })
             .catch(() => {
@@ -37,19 +39,25 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
         return () => { isMounted = false; };
     }, [symbol]);
 
-    // Is stock ke kitne shares user ke paas hain
+    // Redirect to portfolio 3.5s after a successful trade
+    // (the timer is cancelled if the user leaves the page early)
+    useEffect(() => {
+        if (!showSuccess) return;
+        const id = setTimeout(() => navigate("/portfolio"), 3500);
+        return () => clearTimeout(id);
+    }, [showSuccess, navigate]);
+
+    // How many shares of this stock the user owns
     const ownedShares = holdings[symbol]?.quantity || 0;
 
     const finishTrade = (message) => {
         setSuccessMessage(message);
         setShowSuccess(true);
-        setTimeout(() => navigate("/portfolio"), 3500);
     };
 
     const handleBuy = (stockArg, quantity) => {
-        // App.jsx ka handleBuy true (trade hua) ya false (reject hua) return karta hai
         const success = onBuy(stockArg.symbol, stockArg.price, quantity);
-        if (!success) return;   // reject hua: na success message, na redirect
+        if (!success) return;
 
         finishTrade("You've successfully bought the shares.");
     };
@@ -83,7 +91,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
         );
     }
 
-    // Price History tab ke liye calculations
+    // Calculations for the Price History tab
     const dayChange = stock.price - stock.previousclose;
     const rangeSpan = stock.highprice - stock.lowprice;
     const rangePercent = rangeSpan > 0
@@ -106,7 +114,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
             <section className="stock-header">
                 <div>
                     <p className="stock-symbol">{stock.symbol}</p>
-                    <h1>{stock.symbol}</h1>
+                    <h1>{stock.name || stock.symbol}</h1>
                     <div className="price-row">
                         <span className="stock-price">${stock.price?.toFixed(2)}</span>
                         <span className={stock.change >= 0 ? "positive-text" : "negative-text"}>
@@ -172,7 +180,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
                         <span>Low ${stock.lowprice}</span>
                         <span>High ${stock.highprice}</span>
                     </div>
-                    
+
                 </section>
             )}
 
@@ -183,6 +191,7 @@ function StockDetail({ balance, holdings, onBuy, onSell }) {
                 onBuy={handleBuy}
                 onSell={handleSell}
             />
+       
         </main>
     );
 }
