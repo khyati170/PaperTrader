@@ -7,7 +7,12 @@ import {
 } from "react-router-dom";
 import { useState, useEffect } from "react";
 
+import NewsPage from "./pages/NewsPage";
+
+
+
 import { isMarketOpen, getMarketStatusMessage } from "./config/marketConfig.js";
+
 
 import Navbar from "./components/navbar";
 import Home from "./pages/Home";
@@ -342,8 +347,27 @@ function App() {
           }
         />
 
-        <Route path="/" element={<Home isAuthenticated={isAuthenticated} />} />
-        <Route path="/lessons" element={<Lessons />} />
+        <Route
+          path="/"
+          element={
+            <Home
+              isAuthenticated={isAuthenticated}
+            />
+          }
+        />
+        <Route
+          path="/lessons"
+          element={<Lessons />}/>
+
+          <Route
+  path="/news"
+  element={<NewsPage holdings={holdings} />}
+/>
+     
+
+
+       
+
       </Routes>
     </BrowserRouter>
   );
