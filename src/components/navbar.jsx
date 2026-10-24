@@ -27,7 +27,6 @@ return ( <nav className="bar"> <div className="logo"> <span className="logo-mark
 <NavLink to="/" onClick={() => setMenuOpen(false)}>
 PaperTrader </NavLink> </div>
 
-```
   <div className={`links ${menuOpen ? "links-open" : ""}`}>
     <NavLink
       to="/"
