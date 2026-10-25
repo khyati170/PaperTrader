@@ -73,7 +73,11 @@ function Hero({ isAuthenticated = false }) {
             </p>
 
             <div className="hero-buttons">
+
               <Link to={startPath} className="hero-primary">
+
+              <Link to="/login" className="hero-primary">
+
                 Start with $50,000
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" />

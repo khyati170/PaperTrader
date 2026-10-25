@@ -17,9 +17,13 @@ function Portfolio({ balance, holdings, transactions = [], onSell }) {
   const [stocks, setStocks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [groupBy, setGroupBy] = useState("stock");
+
+  const [sellSymbol, setSellSymbol] = useState(null);
+
   const [sellSymbol, setSellSymbol] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -273,41 +277,52 @@ function Portfolio({ balance, holdings, transactions = [], onSell }) {
         </div>
       )}
 
-      {/* ---------- Transaction History ---------- */}
-      <div className="portfolio-heading">
-        <h2 className="section-heading">Transaction History</h2>
-      </div>
+   
+<div className="portfolio-heading">
+  <button
+    type="button"
+    className="history-toggle"
+    onClick={() => setShowHistory((prev) => !prev)}
+    aria-expanded={showHistory}
+  >
+    <h2 className="section-heading">
+      Transaction History ({transactions.length})
+    </h2>
+    <span className={showHistory ? "history-arrow open" : "history-arrow"}>▾</span>
+  </button>
+</div>
 
-      {transactions.length === 0 ? (
-        <p className="empty-state">No transactions yet.</p>
-      ) : (
-        <div className="holdings-table-wrap">
-          <table className="holdings-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Symbol</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((t) => (
-                <tr key={t.id}>
-                  <td>{new Date(t.date).toLocaleString()}</td>
-                  <td className={t.type === "BUY" ? "gain" : "loss"}>{t.type}</td>
-                  <td className="symbol-cell">{t.symbol}</td>
-                  <td>{t.quantity}</td>
-                  <td>${Number(t.price).toFixed(2)}</td>
-                  <td>${Number(t.total).toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+{showHistory &&
+  (transactions.length === 0 ? (
+    <p className="empty-state">No transactions yet.</p>
+  ) : (
+    <div className="holdings-table-wrap">
+      <table className="holdings-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Symbol</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {transactions.map((t) => (
+            <tr key={t.id}>
+              <td>{new Date(t.date).toLocaleString()}</td>
+              <td className={t.type === "BUY" ? "gain" : "loss"}>{t.type}</td>
+              <td className="symbol-cell">{t.symbol}</td>
+              <td>{t.quantity}</td>
+              <td>${Number(t.price).toFixed(2)}</td>
+              <td>${Number(t.total).toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  ))}
 
       {/* ---------- Sell modal ---------- */}
       <TradeModal
