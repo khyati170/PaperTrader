@@ -5,7 +5,7 @@ function Modal({
     isOpen, title, children, onConfirm, onCancel,
     confirmText = "Confirm", cancelText = "Cancel", confirmClass = "buy-button",
 }) {
-    // Escape dabane par modal band ho jaye
+
     useEffect(() => {
         if (!isOpen) return;
         const onKey = (e) => { if (e.key === "Escape") onCancel(); };

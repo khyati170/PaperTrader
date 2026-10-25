@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Modal from "./Modal";
 
-// Pure function: error string wapas deta hai, ya "" agar sab theek hai
 const validateQuantity = (value, max, tooManyMessage) => {
     if (value === "") return "Enter a quantity";
     const qty = Number(value);
@@ -22,7 +21,7 @@ function BuySellForm({ stock, ownedShares, balance, avgBuyPrice = 0, onBuy, onSe
     const [sellQuantity, setSellQuantity] = useState("");
     const [buyError, setBuyError] = useState("");
     const [sellError, setSellError] = useState("");
-    const [pending, setPending] = useState(null); // { type: "buy" | "sell", quantity }
+    const [pending, setPending] = useState(null);
 
     const price = stock.price || 0;
     const maxAffordable = price > 0 ? Math.floor(balance / price) : 0;
@@ -42,7 +41,6 @@ function BuySellForm({ stock, ownedShares, balance, avgBuyPrice = 0, onBuy, onSe
         clearError("");
     };
 
-    // Chips: seedha value set karo (galat ho to validation error dikhayega)
     const setChip = (value, setter, clearError) => {
         setter(value > 0 ? String(value) : "");
         clearError("");
@@ -72,7 +70,6 @@ function BuySellForm({ stock, ownedShares, balance, avgBuyPrice = 0, onBuy, onSe
         setPending({ type: "sell", quantity: Number(sellQuantity) });
     };
 
-    // Modal mein "Confirm" dabane par asli buy/sell hota hai
     const handleConfirm = () => {
         if (pending.type === "buy") {
             onBuy(stock, pending.quantity);

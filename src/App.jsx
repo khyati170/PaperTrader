@@ -9,10 +9,7 @@ import { useState, useEffect } from "react";
 
 import NewsPage from "./pages/NewsPage";
 
-
-
 import { isMarketOpen, getMarketStatusMessage } from "./config/marketConfig.js";
-
 
 import Navbar from "./components/navbar";
 import Home from "./pages/Home";
@@ -41,7 +38,6 @@ function readUserData(email) {
   }
 }
 
-// Runs once on page load: restores the logged-in user and their saved data
 function loadInitial() {
   try {
     const session = JSON.parse(localStorage.getItem(SESSION_KEY));
@@ -50,18 +46,28 @@ function loadInitial() {
       if (data) return { user: session, data };
     }
   } catch {
-    // ignore corrupted storage
   }
   return { user: null, data: EMPTY_DATA };
 }
 
-// Sends logged-out visitors to /login, then back to the page they wanted
 function RequireAuth({ isAuthenticated, children }) {
   const location = useLocation();
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   return children;
+}
+
+function LoginRoute({ isAuthenticated, onLogin }) {
+  const location = useLocation();
+
+  if (isAuthenticated) {
+    const from = location.state?.from?.pathname;
+    const target = from && from !== "/login" ? from : "/market";
+    return <Navigate to={target} replace />;
+  }
+
+  return <Login onLogin={onLogin} />;
 }
 
 function App() {
@@ -74,7 +80,6 @@ function App() {
 
   const isAuthenticated = user !== null;
 
-  // Save this user's data whenever anything changes (only while logged in)
   useEffect(() => {
     if (!user) return;
     localStorage.setItem(
@@ -99,7 +104,7 @@ function App() {
     setTransactions((prev) => [
       {
         id: makeId(),
-        type, // "BUY" or "SELL"
+        type,
         symbol,
         quantity,
         price,
@@ -116,10 +121,8 @@ function App() {
     let data;
 
     if (saved) {
-      // Returning user: load exactly what they had
       data = saved;
     } else {
-      // First login ever for this account: seed from signup / demo data
       const formattedHoldings = {};
       (userData.holdings || []).forEach((stock) => {
         formattedHoldings[stock.symbol] = {
@@ -164,7 +167,6 @@ function App() {
     setUser(sessionUser);
   };
 
-  // LOGOUT: clears the screen state only. The saved data stays in localStorage.
   const handleLogout = () => {
     setUser(null);
     setBalance(0);
@@ -294,6 +296,11 @@ function App() {
 
       <Routes>
         <Route
+          path="/"
+          element={<Home isAuthenticated={isAuthenticated} />}
+        />
+
+        <Route
           path="/market"
           element={
             <MarketPage
@@ -331,7 +338,15 @@ function App() {
           }
         />
 
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route
+          path="/login"
+          element={
+            <LoginRoute
+              isAuthenticated={isAuthenticated}
+              onLogin={handleLogin}
+            />
+          }
+        />
 
         <Route
           path="/portfolio"
@@ -347,27 +362,9 @@ function App() {
           }
         />
 
-        <Route
-          path="/"
-          element={
-            <Home
-              isAuthenticated={isAuthenticated}
-            />
-          }
-        />
-        <Route
-          path="/lessons"
-          element={<Lessons />}/>
+        <Route path="/lessons" element={<Lessons />} />
 
-          <Route
-  path="/news"
-  element={<NewsPage holdings={holdings} />}
-/>
-     
-
-
-       
-
+        <Route path="/news" element={<NewsPage holdings={holdings} />} />
       </Routes>
     </BrowserRouter>
   );

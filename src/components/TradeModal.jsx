@@ -8,10 +8,7 @@ const usd = (n) =>
         maximumFractionDigits: 2,
     })}`;
 
-/**
- * mode: "buy" | "sell"
- * onConfirm(quantity) -> parent trade karta hai. false return kare to modal khula rehta hai.
- */
+
 function TradeModal({
     isOpen, mode, stock, ownedShares = 0, avgBuyPrice = 0, balance = 0,
     onConfirm, onCancel,

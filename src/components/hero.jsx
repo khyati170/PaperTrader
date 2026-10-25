@@ -1,4 +1,4 @@
-import { useState ,useEffect} from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const VALUE = "$106,284.40";
@@ -23,10 +23,10 @@ const RANGES = {
 };
 
 const STATS = [
-  { value: "$100K", label: "virtual cash to start" },
+  { value: "$50K", label: "virtual cash to start" },
   { value: "Live", label: "real market prices" },
-  { value: "52-week", label: "range-based buy signals" },
-  { value: "CAGR", label: "what-if projections" },
+  { value: "News", label: "latest headlines on every stock" },
+  { value: "P&L", label: "profit and loss on every holding" },
 ];
 
 const CHECKS = ["Real market data", "Buy and sell signals", "No card needed"];
@@ -35,9 +35,12 @@ const W = 400;
 const H = 160;
 const PAD = 16;
 
-function Hero() {
+function Hero({ isAuthenticated = false }) {
   const [range, setRange] = useState("1M");
   const { series, change, marker } = RANGES[range];
+
+  // Logged in ho toh seedha Market, warna Login
+  const startPath = isAuthenticated ? "/market" : "/login";
 
   const min = Math.min(...series);
   const max = Math.max(...series);
@@ -56,7 +59,7 @@ function Hero() {
           <div className="hero-copy">
             <p className="hero-badge">
               <span className="hero-badge-dot" />
-              Live prices and $100,000 in virtual cash
+              Live prices and $50,000 in virtual cash
             </p>
 
             <h1 className="hero-title">
@@ -65,13 +68,13 @@ function Hero() {
             </h1>
 
             <p className="hero-text">
-              PaperTrader gives you $100,000 in virtual cash and live market prices. Build a
+              PaperTrader gives you $50,000 in virtual cash and live market prices. Build a
               portfolio, test your ideas, and learn from every trade, with no real money at stake.
             </p>
 
             <div className="hero-buttons">
-              <Link to="/login" className="hero-primary">
-                Start with $100,000
+              <Link to={startPath} className="hero-primary">
+                Start with $50,000
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
@@ -104,7 +107,7 @@ function Hero() {
 
             <div className="hero-card">
               <div className="hero-card-top">
-                <span>Portfolio value</span>
+                <span>Portfolio value (sample)</span>
                 <div className="hero-tabs" role="group" aria-label="Chart range">
                   {Object.keys(RANGES).map((r) => (
                     <button key={r} type="button" aria-pressed={r === range} onClick={() => setRange(r)}>

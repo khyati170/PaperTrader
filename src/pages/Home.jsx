@@ -11,7 +11,7 @@ function Home({ isAuthenticated }) {
       <Hero isAuthenticated={isAuthenticated} />
       <HowItworks />
       <FeatureSection/>
-      <FinalCTA/>
+      <FinalCTA isAuthenticated={isAuthenticated} />
       <Footer/>
 
 

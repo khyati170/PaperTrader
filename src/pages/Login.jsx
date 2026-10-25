@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { demoAccount } from "../data/demoAccount";
 import { useToast } from "../context/ToastContext";
 import FormField from "../components/FormField";
 
-// ---------- Pure validation functions (component ke bahar) ----------
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const validateSignup = (v) => {
@@ -38,7 +37,6 @@ const validateLogin = (v) => {
 const getUsers = () => JSON.parse(localStorage.getItem("users") || "[]");
 const saveUsers = (users) => localStorage.setItem("users", JSON.stringify(users));
 
-// Returning user ka last saved balance (App.jsx ki saved data se)
 const getSavedBalance = (email) => {
     try {
         const raw = localStorage.getItem(`paperTrader:data:${email}`);
@@ -55,25 +53,35 @@ const formatMoney = (n) =>
 
 const emptySignup = { name: "", age: "", phone: "", email: "", password: "", confirmPassword: "" };
 
+// URL mein ?mode=signup ho to Sign Up tab, warna Log In tab
+const modeFromUrl = (search) =>
+    new URLSearchParams(search).get("mode") === "signup" ? "signup" : "login";
+
 function Login({ onLogin }) {
-    const [mode, setMode] = useState("login");
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { showToast } = useToast();
+
+    const [mode, setMode] = useState(() => modeFromUrl(location.search));
     const [signup, setSignup] = useState(emptySignup);
     const [login, setLogin] = useState({ id: "", password: "" });
     const [errors, setErrors] = useState({});
     const [formError, setFormError] = useState("");
 
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { showToast } = useToast();
     const redirectTo = location.state?.from?.pathname || "/market";
 
-    // Ek hi function sabhi inputs ke liye: field ka naam leke state update karta hai
+    // Agar user pehle se /login par ho aur link dobara dabaye, tab bhi tab badal jaye
+    useEffect(() => {
+        setMode(modeFromUrl(location.search));
+        setErrors({});
+        setFormError("");
+    }, [location.search]);
+
     const updateSignup = (field) => (e) =>
         setSignup((prev) => ({ ...prev, [field]: e.target.value }));
     const updateLogin = (field) => (e) =>
         setLogin((prev) => ({ ...prev, [field]: e.target.value }));
 
-    // Age: sirf digits allowed (-, ., e type hi nahi honge), max 3 digits
     const updateAge = (e) => {
         const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 3);
         setSignup((prev) => ({ ...prev, age: digitsOnly }));
@@ -86,7 +94,6 @@ function Login({ onLogin }) {
     };
 
     const completeLogin = (user, isNewUser = false) => {
-        // Saved balance login se PEHLE padhna hai (purane trades ke baad ka balance)
         const saved = isNewUser ? null : getSavedBalance(user.email);
 
         onLogin({
@@ -101,7 +108,6 @@ function Login({ onLogin }) {
         if (isNewUser) {
             message = `Welcome, ${user.name}! $50,000 virtual cash has been added to your wallet.`;
         } else if (saved !== null) {
-            // Returning user (ya demo jisme pehle trade ho chuka hai)
             message = `You are successfully logged in, ${user.name}! Your wallet balance is ${formatMoney(saved)}.`;
         } else if (user.isDemo) {
             message = `Welcome, ${user.name}! Your demo portfolio is ready.`;

@@ -10,7 +10,7 @@ function FinalCta() {
         </div>
 
         <div className="cta-actions">
-          <Link to="/signup" className="cta-primary">Create free account</Link>
+          <Link to="/login?mode=signup" className="cta-primary">Create free account</Link>
           <Link to="/market" className="cta-secondary">Browse stocks</Link>
         </div>
       </div>

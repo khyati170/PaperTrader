@@ -7,8 +7,8 @@ import { getStocks, refreshStocks, simulateFetchFailure } from "../data/stocks";
 import { seedSeries } from "../utils/sparkline";
 import "./MarketPage.css";
 
-const POLL_MS = 30000; // 30 sec
-const MAX_POINTS = 40; // chart mein kitne points
+const POLL_MS = 30000;
+const MAX_POINTS = 40;
 const SECTOR_OPTIONS = ["IT", "Banking", "Auto", "Retail", "Entertainment", "Food"];
 
 export default function MarketPage({

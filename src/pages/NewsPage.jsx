@@ -21,7 +21,6 @@ const [selectedSymbol, setSelectedSymbol] = useState("ALL");
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState("");
 
-// Include only companies the user currently owns.
 const symbols = useMemo(
 () =>
 Object.entries(holdings)
@@ -121,8 +120,6 @@ return ( <main className="news-page"> <header className="news-header"> <p classN
     <button
       className="news-refresh"
       onClick={() => {
-        // Changing the selected filter is not needed to refresh.
-        // Reloading the page is a simple refresh for this version.
         window.location.reload();
       }}
       disabled={loading}
