@@ -23,7 +23,7 @@ const RANGES = {
 };
 
 const STATS = [
-  { value: "$100K", label: "virtual cash to start" },
+  { value: "$50K", label: "virtual cash to start" },
   { value: "Live", label: "real market prices" },
   { value: "52-week", label: "range-based buy signals" },
   { value: "CAGR", label: "what-if projections" },
@@ -56,7 +56,7 @@ function Hero() {
           <div className="hero-copy">
             <p className="hero-badge">
               <span className="hero-badge-dot" />
-              Live prices and $100,000 in virtual cash
+              Live prices and $50,000 in virtual cash
             </p>
 
             <h1 className="hero-title">
@@ -65,13 +65,13 @@ function Hero() {
             </h1>
 
             <p className="hero-text">
-              PaperTrader gives you $100,000 in virtual cash and live market prices. Build a
+              PaperTrader gives you $50,000 in virtual cash and live market prices. Build a
               portfolio, test your ideas, and learn from every trade, with no real money at stake.
             </p>
 
             <div className="hero-buttons">
               <Link to="/login" className="hero-primary">
-                Start with $100,000
+                Start with $50,000
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>

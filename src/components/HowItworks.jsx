@@ -1,5 +1,5 @@
 const steps= [
-    {number:1, title: "Sign Up and get $100,000", text: " Create an account and your virtual balanceis ready. No card, no real money."},
+    {number:1, title: "Sign Up and get $50,000", text: " Create an account and your virtual balanceis ready. No card, no real money."},
     {
         number:2,title: "Pick stocks and place trades", text :"Search, filter, and compare real stocks, then buy and sell at live prices."
     },

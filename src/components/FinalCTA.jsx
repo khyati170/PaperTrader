@@ -6,7 +6,7 @@ function FinalCta() {
       <div className="cta-banner">
         <div className="cta-copy">
           <h2>Your first trade is one click away.</h2>
-          <p>Join with $100,000 in virtual cash and start learning on real market prices.</p>
+          <p>Join with $50,000 in virtual cash and start learning on real market prices.</p>
         </div>
 
         <div className="cta-actions">
