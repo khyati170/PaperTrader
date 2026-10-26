@@ -1,15 +1,43 @@
 import { useEffect, useState } from "react";
 import StockCard from "../components/StockCard";
 import { getStocks } from "../data/stocks";
+import { seedSeries } from "../utils/sparkline";
+
+const MAX_POINTS = 40;
 
 function WatchList({ watchlist = [], toggleWatchlist = () => {} }) {
   const [stocks, setStocks] = useState([]);
+  const [history, setHistory] = useState({});
 
   useEffect(() => {
-  getStocks().then((data) => {
-    setStocks(data.stocks || []);
-  });
-}, []);
+    getStocks().then((data) => {
+      setStocks(data.stocks || []);
+    });
+  }, []);
+
+  // Create price history for charts
+  useEffect(() => {
+    if (!stocks.length) return;
+
+    setHistory((prev) => {
+      const next = { ...prev };
+
+      stocks.forEach((stock) => {
+        if (stock.price == null) return;
+
+        if (!next[stock.symbol]) {
+          next[stock.symbol] = seedSeries(stock);
+        } else {
+          next[stock.symbol] = [
+            ...next[stock.symbol],
+            stock.price,
+          ].slice(-MAX_POINTS);
+        }
+      });
+
+      return next;
+    });
+  }, [stocks]);
 
   const watchlistedStocks = stocks.filter((stock) =>
     watchlist.includes(stock.symbol)
@@ -35,6 +63,8 @@ function WatchList({ watchlist = [], toggleWatchlist = () => {} }) {
               hp={stock.highprice}
               lp={stock.lowprice}
               op={stock.openprice}
+              view="chart"
+              history={history[stock.symbol] || []}
               isWatchlisted={true}
               onWatchlistClick={() => toggleWatchlist(stock.symbol)}
             />

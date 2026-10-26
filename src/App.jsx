@@ -64,10 +64,11 @@ function App() {
   }, []);
 
   // Data badle toh json-server mein save (load hone se pehle nahi)
-  useEffect(() => {
-    if (user && status === "ready") dispatch(saveUserData());
-  }, [user, balance, holdings, transactions, watchlist, status, dispatch]);
+ useEffect(() => {
+  if (!user || status !== "ready") return;
 
+  dispatch(saveUserData());
+}, [user, balance, holdings, transactions, watchlist, status, dispatch]);
   const toggleWatchlist = (symbol) => {
     if (!isAuthenticated) {
       alert("Please login or use Demo Account to use the watchlist.");

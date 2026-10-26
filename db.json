@@ -1,19 +1,53 @@
 {
-  "posts": [
+  "userData": [
     {
-      "id": 1,
-      "title": "json-server",
-      "author": "typicode"
+      "id": "aarushi.sh192@gmail.com",
+      "balance": 46317.45,
+      "holdings": {
+        "AAPL": {
+          "quantity": 6,
+          "avgBuyPrice": 346.5333333333333,
+          "buyDate": "2026-10-26"
+        },
+        "GOOGL": {
+          "quantity": 5,
+          "avgBuyPrice": 320.67,
+          "buyDate": "2026-10-26"
+        }
+      },
+      "transactions": [
+        {
+          "id": "1793028354653-c9wphn",
+          "type": "BUY",
+          "symbol": "GOOGL",
+          "quantity": 5,
+          "price": 320.67,
+          "total": 1603.3500000000001,
+          "date": "2026-10-26T15:25:54.653Z"
+        },
+        {
+          "id": "1793028308270-v1zkhj",
+          "type": "BUY",
+          "symbol": "AAPL",
+          "quantity": 5,
+          "price": 346.53,
+          "total": 1732.6499999999999,
+          "date": "2026-10-26T15:25:08.270Z"
+        },
+        {
+          "id": "1793028081338-chhv74",
+          "type": "BUY",
+          "symbol": "AAPL",
+          "quantity": 1,
+          "price": 346.55,
+          "total": 346.55,
+          "date": "2026-10-26T15:21:21.338Z"
+        }
+      ],
+      "watchlist": [
+        "AAPL",
+        "MSFT"
+      ]
     }
-  ],
-  "comments": [
-    {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
-    }
-  ],
-  "profile": {
-    "name": "typicode"
-  }
+  ]
 }

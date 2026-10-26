@@ -60,6 +60,7 @@ export const loadUserData = createAsyncThunk("user/load", async (userData) => {
       transactions: seededTransactions,
       watchlist: [],
     };
+    
   }
 
   const sessionUser = {
@@ -74,16 +75,61 @@ export const loadUserData = createAsyncThunk("user/load", async (userData) => {
 });
 
 // State badalne par poora data json-server mein save
-export const saveUserData = createAsyncThunk("user/save", async (_, { getState }) => {
-  const { user, balance, holdings, transactions, watchlist } = getState().user;
-  const body = { id: user.email, balance, holdings, transactions, watchlist };
-  try {
-    await api.put(`/userData/${encodeURIComponent(user.email)}`, body);
-  } catch (err) {
-    if (err.status === 404) await api.post("/userData", body); // pehli baar create
-    else throw err;
+// export const saveUserData = createAsyncThunk("user/save", async (_, { getState }) => {
+//   const { user, balance, holdings, transactions, watchlist } = getState().user;
+//   const body = { id: user.email, balance, holdings, transactions, watchlist };
+//   try {
+//     await api.put(`/userData/${encodeURIComponent(user.email)}`, body);
+//   } catch (err) {
+//     if (err.status === 404) await api.post("/userData", body); // pehli baar create
+//     else throw err;
+//   }
+// });
+export const saveUserData = createAsyncThunk(
+  "user/save",
+  async (_, { getState }) => {
+    const { user, balance, holdings, transactions, watchlist } =
+      getState().user;
+
+    console.log("SAVE CALLED:", {
+      user,
+      balance,
+      holdings,
+      transactions,
+      watchlist,
+    });
+
+    const body = {
+      id: user.email,
+      balance,
+      holdings,
+      transactions,
+      watchlist,
+    };
+
+    console.log("SENDING TO SERVER:", body);
+
+    try {
+      const result = await api.put(
+        `/userData/${encodeURIComponent(user.email)}`,
+        body
+      );
+
+      console.log("PUT SUCCESS:", result);
+      return result;
+    } catch (err) {
+      console.log("PUT FAILED:", err.status);
+
+      if (err.status === 404) {
+        const result = await api.post("/userData", body);
+        console.log("POST SUCCESS:", result);
+        return result;
+      }
+
+      throw err;
+    }
   }
-});
+);
 
 // ---------- Slice ----------
 
