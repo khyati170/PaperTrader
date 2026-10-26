@@ -5,7 +5,16 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loadUserData,
+  saveUserData,
+  logout,
+  toggleWatchlist as toggleWatchlistAction,
+  applyBuy,
+  applySell,
+} from "./store/userSlice";
 
 import NewsPage from "./pages/NewsPage";
 
@@ -20,35 +29,6 @@ import Login from "./pages/Login.jsx";
 import Portfolio from "./pages/Portfolio.jsx";
 import Lessons from "./pages/lessons.jsx";
 import TickerTape from "./components/TickerTape";
-
-// ---------- Persistence helpers ----------
-const SESSION_KEY = "paperTrader:session";
-const dataKey = (email) => `paperTrader:data:${email}`;
-const EMPTY_DATA = { balance: 0, holdings: {}, transactions: [], watchlist: [] };
-
-const makeId = () =>
-  `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-
-function readUserData(email) {
-  try {
-    const raw = localStorage.getItem(dataKey(email));
-    return raw ? { ...EMPTY_DATA, ...JSON.parse(raw) } : null;
-  } catch {
-    return null;
-  }
-}
-
-function loadInitial() {
-  try {
-    const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-    if (session?.email) {
-      const data = readUserData(session.email);
-      if (data) return { user: session, data };
-    }
-  } catch {
-  }
-  return { user: null, data: EMPTY_DATA };
-}
 
 function RequireAuth({ isAuthenticated, children }) {
   const location = useLocation();
@@ -71,110 +51,39 @@ function LoginRoute({ isAuthenticated, onLogin }) {
 }
 
 function App() {
-  const [initial] = useState(loadInitial);
-  const [user, setUser] = useState(initial.user);
-  const [balance, setBalance] = useState(initial.data.balance);
-  const [holdings, setHoldings] = useState(initial.data.holdings);
-  const [transactions, setTransactions] = useState(initial.data.transactions);
-  const [watchlist, setWatchlist] = useState(initial.data.watchlist);
+  const dispatch = useDispatch();
+  const { user, balance, holdings, transactions, watchlist, status } =
+    useSelector((s) => s.user);
 
   const isAuthenticated = user !== null;
 
+  // Refresh par: session mila hai toh server se uska data lao
   useEffect(() => {
-    if (!user) return;
-    localStorage.setItem(
-      dataKey(user.email),
-      JSON.stringify({ balance, holdings, transactions, watchlist })
-    );
-  }, [user, balance, holdings, transactions, watchlist]);
+    if (user) dispatch(loadUserData(user));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Data badle toh json-server mein save (load hone se pehle nahi)
+  useEffect(() => {
+    if (user && status === "ready") dispatch(saveUserData());
+  }, [user, balance, holdings, transactions, watchlist, status, dispatch]);
 
   const toggleWatchlist = (symbol) => {
     if (!isAuthenticated) {
       alert("Please login or use Demo Account to use the watchlist.");
       return;
     }
-    setWatchlist((prev) =>
-      prev.includes(symbol)
-        ? prev.filter((s) => s !== symbol)
-        : [...prev, symbol]
-    );
-  };
-
-  const addTransaction = (type, symbol, price, quantity) => {
-    setTransactions((prev) => [
-      {
-        id: makeId(),
-        type,
-        symbol,
-        quantity,
-        price,
-        total: price * quantity,
-        date: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
+    dispatch(toggleWatchlistAction(symbol));
   };
 
   // LOGIN
   const handleLogin = (userData) => {
-    const saved = readUserData(userData.email);
-    let data;
-
-    if (saved) {
-      data = saved;
-    } else {
-      const formattedHoldings = {};
-      (userData.holdings || []).forEach((stock) => {
-        formattedHoldings[stock.symbol] = {
-          quantity: stock.quantity,
-          avgBuyPrice: stock.buyPrice,
-          buyDate: stock.buyDate,
-          name: stock.name,
-        };
-      });
-
-      const seededTransactions = (userData.holdings || []).map((stock) => ({
-        id: makeId(),
-        type: "BUY",
-        symbol: stock.symbol,
-        quantity: stock.quantity,
-        price: stock.buyPrice,
-        total: stock.buyPrice * stock.quantity,
-        date: stock.buyDate,
-      }));
-
-      data = {
-        balance: userData.balance ?? 50000,
-        holdings: formattedHoldings,
-        transactions: seededTransactions,
-        watchlist: [],
-      };
-    }
-
-    const sessionUser = {
-      name: userData.name,
-      email: userData.email,
-      isDemo: !!userData.isDemo,
-    };
-
-    localStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-    localStorage.setItem("accountType", userData.isDemo ? "demo" : "normal");
-
-    setBalance(data.balance);
-    setHoldings(data.holdings);
-    setTransactions(data.transactions);
-    setWatchlist(data.watchlist);
-    setUser(sessionUser);
+    dispatch(loadUserData(userData));
   };
 
+  // LOGOUT
   const handleLogout = () => {
-    setUser(null);
-    setBalance(0);
-    setHoldings({});
-    setTransactions([]);
-    setWatchlist([]);
-    localStorage.removeItem(SESSION_KEY);
-    localStorage.removeItem("accountType");
+    dispatch(logout());
   };
 
   // BUY
@@ -200,39 +109,7 @@ function App() {
       return false;
     }
 
-    setBalance((prev) => prev - cost);
-
-    setHoldings((prev) => {
-      const existing = prev[symbol];
-
-      if (!existing) {
-        return {
-          ...prev,
-          [symbol]: {
-            quantity,
-            avgBuyPrice: price,
-            buyDate: new Date().toISOString().split("T")[0],
-          },
-        };
-      }
-
-      const existingQty = Number(existing.quantity) || 0;
-      const existingAvgPrice = Number(existing.avgBuyPrice) || 0;
-      const totalCost = existingAvgPrice * existingQty + price * quantity;
-      const totalQuantity = existingQty + quantity;
-      const newAvgBuyPrice = totalQuantity > 0 ? totalCost / totalQuantity : 0;
-
-      return {
-        ...prev,
-        [symbol]: {
-          ...existing,
-          quantity: totalQuantity,
-          avgBuyPrice: newAvgBuyPrice,
-        },
-      };
-    });
-
-    addTransaction("BUY", symbol, price, quantity);
+    dispatch(applyBuy(symbol, price, quantity));
     return true;
   };
 
@@ -252,36 +129,14 @@ function App() {
       return false;
     }
 
-    const existing = holdings[symbol];
-    const currentlyOwned = Number(existing?.quantity) || 0;
+    const currentlyOwned = Number(holdings[symbol]?.quantity) || 0;
 
     if (quantity > currentlyOwned) {
       alert("You don't own that many shares");
       return false;
     }
 
-    setBalance((prev) => prev + price * quantity);
-
-    setHoldings((prev) => {
-      const remaining = currentlyOwned - quantity;
-
-      if (remaining === 0) {
-        const updated = { ...prev };
-        delete updated[symbol];
-        return updated;
-      }
-
-      return {
-        ...prev,
-        [symbol]: {
-          ...existing,
-          quantity: remaining,
-          avgBuyPrice: Number(existing.avgBuyPrice) || 0,
-        },
-      };
-    });
-
-    addTransaction("SELL", symbol, price, quantity);
+    dispatch(applySell(symbol, price, quantity));
     return true;
   };
 
@@ -293,6 +148,19 @@ function App() {
         onLogout={handleLogout}
       />
       <TickerTape />
+
+      {status === "error" && (
+        <div
+          style={{
+            background: "#fdecea",
+            color: "#a5432d",
+            padding: "8px 16px",
+            textAlign: "center",
+          }}
+        >
+          Some features may be temporarily unavailable.
+        </div>
+      )}
 
       <Routes>
         <Route
@@ -333,6 +201,8 @@ function App() {
                 holdings={holdings}
                 onBuy={handleBuy}
                 onSell={handleSell}
+                watchlist={watchlist}
+                toggleWatchlist={toggleWatchlist}
               />
             </RequireAuth>
           }
