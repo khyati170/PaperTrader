@@ -277,3 +277,17 @@
 @media (prefers-reduced-motion: reduce) {
   .news-card { transition: none; }
 }
+.filter-reset {
+  width: 100%;
+  background: transparent;
+  border: 1.5px solid var(--color-accent);
+  color: var(--color-accent);
+  border-radius: 40px;
+  padding: 8px 0;
+  font-size: 13px;
+  cursor: pointer;
+}
+.filter-reset:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}

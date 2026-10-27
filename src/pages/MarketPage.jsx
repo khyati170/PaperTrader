@@ -6,6 +6,8 @@ import SkeletonCard from "../components/SkeletonCard";
 import { getStocks, refreshStocks, simulateFetchFailure } from "../data/stocks";
 import { seedSeries } from "../utils/sparkline";
 import "./MarketPage.css";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleSector, setSortBy, setMaxPrice, resetFilters } from "../store/filtersSlice";
 
 const POLL_MS = 30000;
 const MAX_POINTS = 40;
@@ -16,9 +18,9 @@ export default function MarketPage({
   toggleWatchlist = () => {},
 }) {
   const [stocks, setStocks] = useState([]);
-  const [selectedSectors, setSelectedSectors] = useState([]);
-  const [sortBy, setSortBy] = useState("default");
-  const [maxPrice, setMaxPrice] = useState(1000);
+  const dispatch = useDispatch();
+  const { selectedSectors, sortBy, maxPrice } = useSelector((state) => state.filters);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isStale, setIsStale] = useState(false);
   const [fetchedAt, setFetchedAt] = useState(null);
@@ -110,11 +112,11 @@ export default function MarketPage({
     };
   }, [isLoading, noData]);
 
-  const handleSectorChange = (sector) => {
-    setSelectedSectors((prev) =>
-      prev.includes(sector) ? prev.filter((s) => s !== sector) : [...prev, sector]
-    );
-  };
+  const handleSectorChange = (sector) => dispatch(toggleSector(sector));
+
+
+
+
 
   let filteredStocks = stocks.filter((stock) => {
     const sectorMatch =
@@ -173,19 +175,22 @@ export default function MarketPage({
               min="0"
               max="1000"
               value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              onChange={(e) => dispatch(setMaxPrice(Number(e.target.value)))}
             />
             <p>Up to ${maxPrice}</p>
           </div>
 
           <div className="filter-group">
             <p className="filter-title">Sort by</p>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <select value={sortBy} onChange={(e) => dispatch(setSortBy(e.target.value))}>
               <option value="default">Default</option>
               <option value="gainers">Top gainers</option>
               <option value="losers">Top losers</option>
             </select>
           </div>
+          <button className="filter-reset" onClick={() => dispatch(resetFilters())}>
+           Reset filters
+          </button>
         </aside>
 
         {!noData && (
