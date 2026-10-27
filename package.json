@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "server": "json-server --watch db.json --port 3001",
-   "dev:all": "concurrently \"npm run server\" \"npm run dev\""
+    "dev:all": "concurrently \"npm run server\" \"npm run dev\""
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.13.0",

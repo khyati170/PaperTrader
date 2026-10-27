@@ -48,6 +48,87 @@
         "AAPL",
         "MSFT"
       ]
+    },
+    {
+      "id": "bhut@gmail.com",
+      "balance": 40998.810000000005,
+      "holdings": {
+        "AAPL": {
+          "quantity": 6,
+          "avgBuyPrice": 343.91,
+          "buyDate": "2026-10-27"
+        },
+        "AMZN": {
+          "quantity": 5,
+          "avgBuyPrice": 249.09,
+          "buyDate": "2026-10-27"
+        },
+        "MSFT": {
+          "quantity": 4,
+          "avgBuyPrice": 532.6,
+          "buyDate": "2026-10-27"
+        },
+        "META": {
+          "quantity": 3,
+          "avgBuyPrice": 630.56,
+          "buyDate": "2026-10-27"
+        },
+        "JPM": {
+          "quantity": 5,
+          "avgBuyPrice": 334.04,
+          "buyDate": "2026-10-27"
+        }
+      },
+      "transactions": [
+        {
+          "id": "1793102856628-u1rdo4",
+          "type": "BUY",
+          "symbol": "JPM",
+          "quantity": 5,
+          "price": 334.04,
+          "total": 1670.2,
+          "date": "2026-10-27T12:07:36.628Z"
+        },
+        {
+          "id": "1793102818607-eles1t",
+          "type": "BUY",
+          "symbol": "META",
+          "quantity": 3,
+          "price": 630.56,
+          "total": 1891.6799999999998,
+          "date": "2026-10-27T12:06:58.607Z"
+        },
+        {
+          "id": "1793102796593-zpjc8d",
+          "type": "BUY",
+          "symbol": "MSFT",
+          "quantity": 4,
+          "price": 532.6,
+          "total": 2130.4,
+          "date": "2026-10-27T12:06:36.593Z"
+        },
+        {
+          "id": "1793102783091-uk38ss",
+          "type": "BUY",
+          "symbol": "AMZN",
+          "quantity": 5,
+          "price": 249.09,
+          "total": 1245.45,
+          "date": "2026-10-27T12:06:23.091Z"
+        },
+        {
+          "id": "1793102759950-5gwh2r",
+          "type": "BUY",
+          "symbol": "AAPL",
+          "quantity": 6,
+          "price": 343.91,
+          "total": 2063.46,
+          "date": "2026-10-27T12:05:59.950Z"
+        }
+      ],
+      "watchlist": [
+        "AMZN"
+      ]
     }
   ]
 }

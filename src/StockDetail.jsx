@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getStocks } from "./data/stocks.js";
-import {getQuote,getProfile,getMetrics,getRatings,getPeers,getNews,} from "./data/stockExtras.js";
+import { getQuote, getProfile, getMetrics, getRatings, getPeers, getNews, } from "./data/stockExtras.js";
 import { isMarketOpen } from "./config/marketConfig.js";
 import TradeModal from "./components/TradeModal.jsx";
 import "./stockDetail.css";
@@ -18,7 +18,6 @@ const usd = (n) =>
             maximumFractionDigits: 2,
         })}`;
 
-// Finnhub market cap millions of USD mein deta hai
 const formatMarketCap = (millions) => {
     if (!millions) return "—";
     if (millions >= 1e6) return `$${(millions / 1e6).toFixed(2)}T`;
@@ -86,7 +85,6 @@ function StockDetail({
                 setAllStocks(list);
                 setStock(found);
 
-                // Chart ki shuruaat: Open se abhi tak
                 if (found) {
                     setSeries([
                         { label: "Open", price: found.openprice || found.price },
@@ -108,7 +106,6 @@ function StockDetail({
         };
     }, [symbol]);
 
-    // 2. Extra data (profile, stats, ratings, peers, news)
     useEffect(() => {
         let alive = true;
         setExtras(EMPTY_EXTRAS);
@@ -130,13 +127,12 @@ function StockDetail({
         };
     }, [symbol]);
 
-    // 3. Market khula ho to har 30 sec mein fresh price (sirf 1 API call)
     useEffect(() => {
         if (!hasStock || !isMarketOpen()) return;
         let cancelled = false;
 
         const id = setInterval(async () => {
-            if (document.hidden) return; // tab background mein ho to skip
+            if (document.hidden) return;
             const quote = await getQuote(symbol);
             if (cancelled || !quote) return;
 
@@ -152,14 +148,13 @@ function StockDetail({
         };
     }, [symbol, hasStock]);
 
-    // 4. Trade ke baad 3.5 sec mein portfolio par redirect
     useEffect(() => {
         if (!showSuccess) return;
         const id = setTimeout(() => navigate("/portfolio"), 3500);
         return () => clearTimeout(id);
     }, [showSuccess, navigate]);
 
-    // ---------- Trade handler (modal ke Confirm se chalta hai) ----------
+    // ---------- Trade handler ----------
     const ownedShares = Number(holdings[symbol]?.quantity) || 0;
     const avgBuyPrice = Number(holdings[symbol]?.avgBuyPrice) || 0;
 
@@ -169,7 +164,7 @@ function StockDetail({
             ? onBuy(stock.symbol, stock.price, quantity)
             : onSell(stock.symbol, stock.price, quantity);
 
-        if (success === false) return false; // modal khula rahega
+        if (success === false) return false;
 
         setTradeMode(null);
         setSuccessMessage(
@@ -181,7 +176,7 @@ function StockDetail({
         return true;
     };
 
-    // ---------- Early returns (saare hooks upar ho chuke hain) ----------
+    // ---------- Early returns ----------
     if (loading) return <p className="loading-text">Loading {symbol}...</p>;
 
     if (error) {
@@ -222,12 +217,10 @@ function StockDetail({
     const sessionStart = series[0]?.price || stock.price;
     const sessionChange = sessionStart ? ((stock.price - sessionStart) / sessionStart) * 100 : 0;
 
-    // Your position
     const marketValue = stock.price * ownedShares;
     const positionPL = (stock.price - avgBuyPrice) * ownedShares;
     const positionPLPct = avgBuyPrice > 0 ? (stock.price / avgBuyPrice - 1) * 100 : 0;
 
-    // Signal (simple: aaj ke price change par based)
     let signal = { label: "HOLD", index: 1, text: "Price is within its normal range today." };
     if (changePct >= 2) {
         signal = { label: "BUY", index: 2, text: "Price is rising strongly today." };
@@ -235,13 +228,11 @@ function StockDetail({
         signal = { label: "SELL", index: 0, text: "Price is falling sharply today." };
     }
 
-    // 52-week bar
     const has52 = metrics?.high52 != null && metrics?.low52 != null && metrics.high52 > metrics.low52;
     const range52Percent = has52
         ? Math.min(100, Math.max(0, ((stock.price - metrics.low52) / (metrics.high52 - metrics.low52)) * 100))
         : 50;
 
-    // Analyst ratings
     const ratingRows = ratings
         ? [
             { key: "strongBuy", label: "Strong buy", count: ratings.strongBuy, color: "#0b5a43" },
@@ -253,7 +244,6 @@ function StockDetail({
         : [];
     const ratingsTotal = ratingRows.reduce((sum, r) => sum + r.count, 0);
 
-    // Similar stocks: sirf wahi jo humare market list mein hain (taaki click par page khule)
     const knownSymbols = new Set(allStocks.map((s) => s.symbol));
     const similar = (peers || []).filter((s) => knownSymbols.has(s)).slice(0, 6);
 
@@ -323,7 +313,6 @@ function StockDetail({
                     </p>
                 </div>
             </section>
-
             {/* ---------- Chart ---------- */}
             <section className="sd-card">
                 <div className="sd-chart-head">
@@ -545,11 +534,6 @@ function StockDetail({
                                         rel="noopener noreferrer"
                                         className="sd-news-item"
                                     >
-                                        {n.image ? (
-                                            <img className="sd-news-thumb" src={n.image} alt="" loading="lazy" />
-                                        ) : (
-                                            <div className="sd-news-thumb" />
-                                        )}
                                         <div>
                                             <p className="sd-news-title">{n.title}</p>
                                             <p className="sd-news-meta">

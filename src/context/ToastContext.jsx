@@ -9,11 +9,10 @@ export function ToastProvider({ children }) {
         setToasts((prev) => prev.filter((t) => t.id !== id));
     }, []);
 
-    // type: "success" | "error" | "info"
     const showToast = useCallback((message, type = "info") => {
         const id = Date.now() + Math.random();
         setToasts((prev) => [...prev, { id, message, type }]);
-        setTimeout(() => removeToast(id), 3000); // 3 sec baad auto remove
+        setTimeout(() => removeToast(id), 3000);
     }, [removeToast]);
 
     return (
